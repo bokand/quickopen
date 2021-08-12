@@ -95,17 +95,19 @@ def run_command_in_existing(daemon_host, daemon_port, args, auto_start=True):
   # We may have to try a few times --- it may be coming up still.
   connected = False
   s = None
+  success = False
   for i in range(20): # 5 seconds
     try:
       s = socket.socket()
       s.connect((daemon_host, port))
+      success = True
       break
     except:
       time.sleep(0.25)
-  if not s:
+  if not success:
     raise Exception("Could not connect to the provided process.")
   try:
-    f = s.makefile()
+    f = s.makefile(mode="rw")
 
     # Send our commandline to the existing quickopend. Pass with it our
     # daemon_host and daemon_port so that it tries talking to the same quickopend
@@ -119,8 +121,14 @@ def run_command_in_existing(daemon_host, daemon_port, args, auto_start=True):
 
     # Wait for the result of the quickopening. It comes over as a repr'd string
     # so eval it to get the real multi-line string.
-    l = eval(f.readline(), {}, {})
-    return l
+    response = f.readline()
+    if response:
+      return eval(response, {}, {})
+    return ""
+  except Exception as e:
+    print(e)
+    import traceback
+    traceback.print_exc()
   finally:
     s.close()
 

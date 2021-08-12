@@ -30,6 +30,7 @@ import time
 from .event import Event
 from trace_event import *
 from .silent_exception import *
+from functools import total_ordering
 
 """
 Exception that you can throw in a handler that will trigger a 404 response.
@@ -51,7 +52,7 @@ class _RequestHandler(http.server.BaseHTTPRequestHandler):
       self.send_header('Content-Type', 'application/json')
       self.send_header('Content-Length', len(text))
       self.end_headers()
-      self.wfile.write(text)
+      self.wfile.write(text.encode('utf-8'))
     except IOError:
       return
 
@@ -73,9 +74,9 @@ class _RequestHandler(http.server.BaseHTTPRequestHandler):
 
     if 'Content-Length' in self.headers:
       cl = int(self.headers['Content-Length'])
-      text = self.rfile.read(cl).encode('utf8')
+      text = self.rfile.read(cl)
       try:
-        if text != '':
+        if text != b'':
           obj = json.loads(text)
         else:
           obj = None
@@ -135,14 +136,21 @@ class Route(object):
     self.output = output
     self.handler = handler
 
+@total_ordering
 class _Timeout(object):
   def __init__(self, cb, deadline, args):
     self.cb = cb
     self.deadline = deadline
     self.args = args
 
-  def __cmp__(self, that):
-    return cmp(self.deadline, that.deadline)
+  def __eq__(self, other):
+    return self.deadline == other.deadline
+
+  def __ne__(self, other):
+    return not (self == other)
+
+  def __lt__(self, other):
+    return self.deadline < other.deadline
 
 class Daemon(http.server.HTTPServer):
   def __init__(self, test_mode, *args):

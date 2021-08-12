@@ -49,7 +49,7 @@ def _dumps_flat(obj):
     return "%f" % obj
   elif isinstance(obj,int):
     return "%i" % obj
-  elif isinstance(obj,basestring):
+  elif isinstance(obj,str):
     return "\"%s\"" % obj
   else:
     raise PSONException("Unrecognized type %s" % type(obj))
@@ -123,7 +123,7 @@ def _dumps_pretty(i,obj):
     return "%f" % obj
   elif isinstance(obj,int):
     return "%i" % obj
-  elif isinstance(obj,basestring):
+  elif isinstance(obj,str):
     return "\"%s\"" % obj
   else:
     raise PSONException("Unrecognized type %s" % type(obj))

@@ -75,13 +75,13 @@ class DaemonTest(unittest.TestCase):
     res = self.conn.getresponse()
     self.assertEquals(res.status, 500)
     resp = json.loads(res.read())
-    self.assertEquals("""SilentException('Server side error',)""", resp["exception"])
+    self.assertEquals("""SilentException('Server side error')""", resp["exception"])
 
     self.conn.request('POST', '/test_server_exception')
     res = self.conn.getresponse()
     self.assertEquals(res.status, 500)
     resp = json.loads(res.read())
-    self.assertEquals("""SilentException('Server side error',)""", resp["exception"])
+    self.assertEquals("""SilentException('Server side error')""", resp["exception"])
 
   def test_delete(self):
     self.conn.request('DELETE', '/test_delete')

@@ -12,30 +12,30 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import gtk
-import pango
+import gi
+from gi.repository import Gtk, Gdk, Pango
 
 from .event import *
 
 
-class InfoBarGtk(gtk.EventBox):
+class InfoBarGtk(Gtk.EventBox):
   """Represents a single horizontal bar of text, possibly with an
   icon, textual buttons, and a close button. Always visible."""
   def __init__(self, text = ""):
-    gtk.EventBox.__init__(self)
-    self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#FBE99C"))
+    Gtk.EventBox.__init__(self)
+    self.modify_bg(Gtk.StateType.NORMAL, Gdk.color_parse("#FBE99C"))
 
-    self._label = gtk.Label()
-    self._label.set_property('ellipsize', pango.ELLIPSIZE_END)
+    self._label = Gtk.Label()
+    self._label.set_property('ellipsize', Pango.EllipsizeMode.END)
     self._label.set_text(text)
     self._label.set_tooltip_text(text)
 
     self._label.set_size_request(-1,36)
 
-    self._hbox1 = gtk.HBox()
-    self._hbox2 = gtk.HBox()
+    self._hbox1 = Gtk.HBox()
+    self._hbox2 = Gtk.HBox()
     self.add(self._hbox1)
-    self._icon_bin = gtk.Alignment(0,0.5,0,0)
+    self._icon_bin = Gtk.Alignment()
     self._hbox1.pack_start(self._icon_bin, False, True, 5)
     self._hbox1.pack_start(self._label, True, True, 5)
     self._hbox1.pack_start(self._hbox2, False, True, 5)
@@ -46,23 +46,25 @@ class InfoBarGtk(gtk.EventBox):
 
   def set_icon(self, image):
     if image == None:
-      self._icon_bin.remove(gtk._icon_bin.get_children()[0])
+      self._icon_bin.remove(Gtk._icon_bin.get_children()[0])
     else:
+      image.set_valign(Gtk.Align.CENTER)
       self._icon_bin.add(image)
 
   def set_stock_icon(self, stock):
     if stock== None:
-      self._icon_bin.remove(gtk._icon_bin.get_children()[0])
+      self._icon_bin.remove(Gtk._icon_bin.get_children()[0])
     else:
-      image = gtk.image_new_from_stock(stock, gtk.ICON_SIZE_SMALL_TOOLBAR)
+      image = Gtk.Image.new_from_stock(stock, Gtk.IconSize.SMALL_TOOLBAR)
+      image.set_valign(Gtk.Align.CENTER)
       self._icon_bin.add(image)
 
   def add_button(self, label, cb, *userdata):
-    bn = gtk.Button(label)
-#    bn.set_property('relief', gtk.RELIEF_NONE)
+    bn = Gtk.Button(label)
+#    bn.set_property('relief', Gtk.RELIEF_NONE)
     bn.set_property('can-focus', False)
-#    bn.modify_bg(gtk.STATE_PRELIGHT, gtk.gdk.color_parse("#E1D18C"))
-#    bn.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#E1D18C"))
+#    bn.modify_bg(Gtk.StateType.PRELIGHT, Gdk.color_parse("#E1D18C"))
+#    bn.modify_bg(Gtk.StateType.NORMAL, Gdk.color_parse("#E1D18C"))
     self._hbox2.pack_start(self._mka(bn),False,False,2)
     def on_click(*args):
       cb(*userdata)
@@ -72,12 +74,12 @@ class InfoBarGtk(gtk.EventBox):
   def add_close_button(self, cb = None, *userdata):
     assert self._has_close_button == False
     self._has_close_button = True
-    bn = gtk.Button()
-    bn.set_property('relief', gtk.RELIEF_NONE)
+    bn = Gtk.Button()
+    bn.set_property('relief', Gtk.ReliefStyle.NONE)
     bn.set_property('can-focus', False)
-    bn.set_image(gtk.image_new_from_stock(gtk.STOCK_CLOSE, gtk.ICON_SIZE_SMALL_TOOLBAR))
-    bn.modify_bg(gtk.STATE_PRELIGHT, gtk.gdk.color_parse("#E1D18C"))
-    bn.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#E1D18C"))
+    bn.set_image(Gtk.Image.new_from_stock(Gtk.STOCK_CLOSE, Gtk.IconSize.SMALL_TOOLBAR))
+    bn.modify_bg(Gtk.StateType.PRELIGHT, Gdk.color_parse("#E1D18C"))
+    bn.modify_bg(Gtk.StateType.NORMAL, Gdk.color_parse("#E1D18C"))
     self._hbox1.pack_end(self._mka(bn),False,False,2)
     def on_click(*args):
       if cb:
@@ -105,21 +107,21 @@ class InfoBarGtk(gtk.EventBox):
     self._label.set_text(text)
 
   def _mka(self, bn):
-    a = gtk.Alignment(0,0.5,0,0.0)
+    a = Gtk.Alignment(yalign=0.5)
     a.add(bn)
     return a
 
 
-class _BSeparator(gtk.EventBox):
+class _BSeparator(Gtk.EventBox):
   def __init__(self):
-    gtk.EventBox.__init__(self)
-    self.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#FBE99C"))
-    self.add(gtk.HSeparator())
+    Gtk.EventBox.__init__(self)
+    self.modify_bg(Gtk.StateType.NORMAL, Gdk.color_parse("#FBE99C"))
+    self.add(Gtk.HSeparator())
 
-class InfoBarGtkCollection(gtk.VBox):
+class InfoBarGtkCollection(Gtk.VBox):
   """A collection of butter bars"""
   def __init__(self):
-    gtk.VBox.__init__(self)
+    Gtk.VBox.__init__(self)
     self._num_bars = 0
 
   def has_bar(self, bar):
@@ -147,12 +149,12 @@ class InfoBarGtkCollection(gtk.VBox):
 
     bar.after_button_pressed.add_listener(close_bar)
 
-    grp = gtk.VBox()
+    grp = Gtk.VBox()
     if self._num_bars >= 1:
       sep = _BSeparator()
-      grp.pack_start(sep)
-    grp.pack_start(bar)
-    self.pack_start(grp)
+      grp.pack_start(sep, True, True, 0)
+    grp.pack_start(bar, True, True, 0)
+    self.pack_start(grp, True, True, 0)
     grp.show_all()
     self._num_bars += 1
 
@@ -166,16 +168,16 @@ class InfoBarGtkCollection(gtk.VBox):
       return grp.get_children()[1]
 
 if __name__ == "__main__" and False:
-  w = gtk.Window()
+  w = Gtk.Window()
   w.set_size_request(400,-1)
   b = InfoBarGtk()
   b.text = "blah blah blah"
   w.add(b)
   w.show_all()
-  gtk.main()
+  Gtk.main()
 
 if __name__ == "__main__" and True:
-  w = gtk.Window()
+  w = Gtk.Window()
   w.set_size_request(400,-1)
   bbc = InfoBarGtkCollection()
 
@@ -185,7 +187,7 @@ if __name__ == "__main__" and True:
 
   # bb1
   bb = InfoBarGtk("this is informational")
-  bb.set_stock_icon(gtk.STOCK_DIALOG_INFO)
+  bb.set_stock_icon(Gtk.STOCK_DIALOG_INFO)
   bbc.add_bar(bb)
 
   # bb1
@@ -195,11 +197,11 @@ if __name__ == "__main__" and True:
 
   # bb1
   bb = InfoBarGtk("OMG you need to do somethnig")
-  bb.set_stock_icon(gtk.STOCK_DIALOG_WARNING)
+  bb.set_stock_icon(Gtk.STOCK_DIALOG_WARNING)
   bb.add_button("Accept", lambda: True)
   bb.add_close_button(lambda: True)
   bbc.add_bar(bb)
 
   w.add(bbc)
   w.show_all()
-  gtk.main()
+  Gtk.main()

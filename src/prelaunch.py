@@ -14,7 +14,7 @@ from __future__ import absolute_import
 # limitations under the License.
 
 # The prelauncher's job is to delegate the quickopen commandline interface
-# to an already "warmed-up" instance of quiclpen launched by the quickopend.
+# to an already "warmed-up" instance of quickopen launched by the quickopend.
 #
 # Importing python GUI libraries is actually quite slow. We want to give
 # users of quickopen a nice snappy experience. So, the prelaunchd counterpart
@@ -64,7 +64,7 @@ def wait_for_command(control_port):
     trace_begin("socket.accept")
     c, a = s.accept()
     trace_end("socket.accept")
-    f = c.makefile()
+    f = c.makefile(mode="rw")
 
     # The commandline comes in as a repr'd array
     # Yes this is not very secure. Donations welcome.

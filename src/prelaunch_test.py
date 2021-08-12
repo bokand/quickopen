@@ -45,7 +45,7 @@ class PrelaunchTest(unittest.TestCase, QuickopenTestBase):
     (stdout, stderr) = proc.communicate()
     if len(stderr):
       print("Error during %s:\n%s\n\n" % (args, stderr))
-    return stdout
+    return stdout.decode('utf-8')
 
   def turn_off_daemon(self):
     self.daemon.close()

@@ -13,8 +13,9 @@ from __future__ import absolute_import
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from builtins import range
-import glib
-import gtk
+import gi
+from gi.repository import Gdk
+from gi.repository import Gtk
 import time
 import logging
 import os
@@ -23,32 +24,32 @@ from .info_bar_gtk import *
 
 from .open_dialog_base import OpenDialogBase
 
-class OpenDialogGtk(gtk.Dialog, OpenDialogBase):
+class OpenDialogGtk(Gtk.Dialog, OpenDialogBase):
   def __init__(self, options, db, initial_filter):
-    gtk.Dialog.__init__(self)
+    Gtk.Dialog.__init__(self)
     OpenDialogBase.__init__(self, options, db, initial_filter)
 
     self.set_title("Quick open...")
     self.set_size_request(1000,400)
-    self.add_button("_Open",gtk.RESPONSE_OK)
-    self.add_button("Cancel",gtk.RESPONSE_CANCEL)
+    self.add_button("_Open",Gtk.ResponseType.OK)
+    self.add_button("Cancel",Gtk.ResponseType.CANCEL)
 
-    model = gtk.ListStore(object)
+    model = Gtk.ListStore(object)
 
-    treeview = gtk.TreeView(model)
-    treeview.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
+    treeview = Gtk.TreeView(model)
+    treeview.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE)
     treeview.get_selection().connect('changed', self._on_treeview_selection_changed)
 
     self.connect('response', self.response)
 
-    text_cell_renderer = gtk.CellRendererText()
+    text_cell_renderer = Gtk.CellRendererText()
 
     def add_column(title,accessor_cb):
-      column = gtk.TreeViewColumn(title, text_cell_renderer)
-      column.set_cell_data_func(text_cell_renderer, lambda column, cell, model, iter: cell.set_property('text', accessor_cb(model.get(iter,0)[0])))
+      column = Gtk.TreeViewColumn(title, text_cell_renderer)
+      column.set_cell_data_func(text_cell_renderer, lambda column, cell, model, iter, data: cell.set_property('text', accessor_cb(model.get(iter,0)[0])))
       treeview.append_column(column)
       return column
-    add_column("Rank",lambda obj: obj[1])
+    add_column("Rank",lambda obj: "{:.4}".format(obj[1]))
     add_column("File",lambda obj: os.path.basename(obj[0]))
     add_column("Path",lambda obj: os.path.dirname(obj[0]))
 
@@ -56,16 +57,16 @@ class OpenDialogGtk(gtk.Dialog, OpenDialogBase):
 
     truncated_bar = InfoBarGtk()
 
-    bad_result_button = gtk.Button("Bad result")
+    bad_result_button = Gtk.Button("Bad result")
     bad_result_button.connect('clicked', lambda *args: self.on_badresult_clicked())
 
-    reindex_button = gtk.Button("_Reindex")
+    reindex_button = Gtk.Button("Reindex")
     reindex_button.connect('clicked', lambda *args: self.on_reindex_clicked())
 
-    status_label = gtk.Label()
+    status_label = Gtk.Label()
     self.status_label = status_label
 
-    filter_entry = gtk.Entry()
+    filter_entry = Gtk.Entry()
     filter_entry.set_text(self._filter_text)
 
     filter_entry.connect('key_press_event', self._on_filter_entry_keypress)
@@ -73,11 +74,11 @@ class OpenDialogGtk(gtk.Dialog, OpenDialogBase):
 
     # attach everything up
     vbox = self.vbox
-    table_vbox = gtk.VBox()
-    treeview_scroll_window = gtk.ScrolledWindow()
-    treeview_scroll_window.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-    table_options_hbox = gtk.HBox()
-    button_hbox = gtk.HBox()
+    table_vbox = Gtk.VBox()
+    treeview_scroll_window = Gtk.ScrolledWindow()
+    treeview_scroll_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+    table_options_hbox = Gtk.HBox()
+    button_hbox = Gtk.HBox()
 
     vbox.pack_start(table_vbox,True,True,1)
     table_vbox.pack_start(table_options_hbox,False,False,0)
@@ -108,57 +109,54 @@ class OpenDialogGtk(gtk.Dialog, OpenDialogBase):
     self.show_all()
 
   def response(self, arg, *rest):
-    canceled = len(rest) > 0 and rest[0] != gtk.RESPONSE_OK
+    canceled = len(rest) > 0 and rest[0] != Gtk.ResponseType.OK
     self.on_done(canceled)
 
   def on_destroy(self, *args):
-    self.response(None, gtk.RESPONSE_CANCEL)
-
-  def redirect_to_treeview(self, event):
-    prev = self.get_focus()
-    self._treeview.grab_focus()
-    ret = self._treeview.emit('key_press_event', event)
-    if prev:
-      prev.grab_focus()
-    return True
+    self.response(None, Gtk.ResponseType.CANCEL)
 
   def _on_filter_entry_keypress(self,entry,event):
-    keyname = gtk.gdk.keyval_name(event.keyval)
+    keyname = Gdk.keyval_name(event.keyval)
 
-    if keyname in ("Up", "Down", "Page_Up", "Page_Down", "Left", "Right"):
-      return self.redirect_to_treeview(event)
-    elif keyname == "space" and event.state & gtk.gdk.CONTROL_MASK:
-      return self.redirect_to_treeview(event)
-    elif keyname == 'n' and event.state & gtk.gdk.CONTROL_MASK:
-      self.move_selection(1)
+    if keyname in ("Up", "Down", "Page_Up", "Page_Down"):
+      self.move_selection(keyname)
       return True
-    elif keyname == 'p' and event.state & gtk.gdk.CONTROL_MASK:
-      self.move_selection(-1)
+    elif keyname in ("Left", "Right"):
+      self.scroll_tree_view(keyname)
       return True
-    elif keyname == 'a' and event.state & gtk.gdk.CONTROL_MASK:
+    elif keyname == "space" and event.state & Gdk.ModifierType.CONTROL_MASK:
+      self._treeview.get_selection().unselect_all()
+      return True
+    elif keyname == 'n' and event.state & Gdk.ModifierType.CONTROL_MASK:
+      self.move_selection("Down")
+      return True
+    elif keyname == 'p' and event.state & Gdk.ModifierType.CONTROL_MASK:
+      self.move_selection("Up")
+      return True
+    elif keyname == 'a' and event.state & Gdk.ModifierType.CONTROL_MASK:
       i = self._filter_entry.set_position(0)
       return True
-    elif keyname == 'e' and event.state & gtk.gdk.CONTROL_MASK:
+    elif keyname == 'e' and event.state & Gdk.ModifierType.CONTROL_MASK:
       self._filter_entry.set_position(len(self._filter_entry.get_text()))
       return True
-    elif keyname == 'f' and event.state & gtk.gdk.CONTROL_MASK:
+    elif keyname == 'f' and event.state & Gdk.ModifierType.CONTROL_MASK:
       i = self._filter_entry.get_position()
       i = min(i + 1, len(self._filter_entry.get_text()))
       self._filter_entry.set_position(i)
       return True
-    elif keyname == 'b' and event.state & gtk.gdk.CONTROL_MASK:
+    elif keyname == 'b' and event.state & Gdk.ModifierType.CONTROL_MASK:
       i = self._filter_entry.get_position()
       if i >= 1:
         self._filter_entry.set_position(i - 1)
       return True
-    elif keyname == 'k' and event.state & gtk.gdk.CONTROL_MASK:
+    elif keyname == 'k' and event.state & Gdk.ModifierType.CONTROL_MASK:
       i = self._filter_entry.get_position()
       t = self._filter_entry.get_text()[:i]
       self._filter_entry.set_text(t)
       self._filter_entry.set_position(len(t))
       return True
     elif keyname == 'Return':
-      self.response(gtk.RESPONSE_OK)
+      self.response(Gtk.ResponseType.OK)
       return True
 
   def _on_filter_text_changed(self,entry):
@@ -167,7 +165,7 @@ class OpenDialogGtk(gtk.Dialog, OpenDialogBase):
 
   def set_results_enabled(self, en):
     self._treeview.set_sensitive(en)
-    self.set_response_sensitive(gtk.RESPONSE_OK, en)
+    self.set_response_sensitive(Gtk.ResponseType.OK, en)
 
   def status_changed(self):
     self.status_label.set_text(self.status_text)
@@ -186,9 +184,10 @@ class OpenDialogGtk(gtk.Dialog, OpenDialogBase):
 
     for i in range(len(files)):
       row = self._model.append()
-      self._model.set(row, 0, (files[i], ranks[i]))
+      self._model.set(row, 0, (files[i], float(ranks[i])))
 
     self._treeview.set_model(self._model)
+    self._treeview.columns_autosize()
     self._treeview.thaw_child_notify()
 
     truncated = False
@@ -205,26 +204,51 @@ class OpenDialogGtk(gtk.Dialog, OpenDialogBase):
         self._treeview.get_selection().select_path((0,))
 
   def _on_treeview_selection_changed(self, selection):
-    self.set_response_sensitive(gtk.RESPONSE_OK,selection.count_selected_rows() != 0)
+    self.set_response_sensitive(Gtk.ResponseType.OK,selection.count_selected_rows() != 0)
 
-  def move_selection(self, direction):
-    sel = self.get_selected_indices()
-    if len(sel) == 0:
-      if self._model.iter_n_children(None) == 0:
-        return
-      self.set_selected_indices([0])
+  def scroll_tree_view(self, keyname):
+    adjustment = self._treeview.get_hadjustment()
+    increment = adjustment.get_step_increment()
+    if keyname == "Left":
+      increment = -increment
+    elif not keyname == "Right":
       return
+    adjustment.set_value(adjustment.get_value() + increment)
 
-    if direction > 0:
-      i = max(sel)
+  def move_selection(self, keyname):
+    selection = self._treeview.get_selection()
+    selected_rows = selection.get_selected_rows()[1]
+    visible_range = self._treeview.get_visible_range()
+
+    if not selected_rows:
+      if visible_range:
+        selection.select_path(visible_range[0])
     else:
-      i = min(sel)
-    i = i + direction
-    if i < 0:
-      return
-    if i >= self._model.iter_n_children(None):
-      return
-    self.set_selected_indices([i])
+      page_size = (visible_range[1].get_indices()[0] -
+                   visible_range[0].get_indices()[0])
+
+      row = selected_rows[-1]
+      selection.unselect_all()
+
+      if keyname == "Up":
+        row.prev()
+      elif keyname == "Down":
+        row.next()
+      elif keyname == "Page_Up":
+        for i in range(page_size):
+          row.prev()
+      elif keyname == "Page_Down":
+        for i in range(page_size):
+          row.next()
+
+      selection.select_path(row)
+
+      #Back up to the last row if we went past the end
+      while not selection.path_is_selected(row):
+        row.prev()
+        selection.select_path(row)
+
+      self._treeview.scroll_to_cell(row, None, False)
 
   def get_selected_indices(self):
     model,rows = self._treeview.get_selection().get_selected_rows()

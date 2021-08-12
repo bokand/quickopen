@@ -17,6 +17,7 @@ from builtins import range
 from builtins import object
 import copy
 from . import fixed_size_dict
+from functools import cmp_to_key
 import os
 import sys
 import time
@@ -98,6 +99,9 @@ def _apply_global_rank_adjustment(base_result, indexed_dirs, query):
         return order
     return sys.maxsize
 
+  def cmp(a, b):
+    return (a > b) - (a < b)
+
   def hit_cmp(x,y):
     # directory order trumps everything
     h = get_order(x[0]) - get_order(y[0])
@@ -121,7 +125,7 @@ def _apply_global_rank_adjustment(base_result, indexed_dirs, query):
     return cmp(x[0], y[0])
 
   hits = list(base_result.hits)
-  hits.sort(hit_cmp)
+  hits.sort(key=cmp_to_key(hit_cmp))
   new_hits = _rerank(hits)
   res = QueryResult(new_hits, base_result.truncated)
   res.debug_info = copy.deepcopy(base_result.debug_info)

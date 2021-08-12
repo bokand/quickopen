@@ -26,7 +26,7 @@ class AsyncHTTPConnectionTest(unittest.TestCase):
     while not conn.is_response_ready():
       time.sleep(0.0001)
     res = conn.get_response()
-    text = res.read()
+    text = res.read().decode('utf-8')
     self.assertEquals(text, '"OK"')
 
   def tearDown(self):

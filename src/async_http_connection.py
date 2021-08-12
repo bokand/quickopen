@@ -64,7 +64,7 @@ class AsyncHTTPConnection(object):
       self.conn.putheader('Connection', 'keep-alive')
       self.conn.endheaders()
       if len(data):
-        self.conn.send(data)
+        self.conn.send(data.encode('utf8'))
       self.state = REQUEST_PENDING
     except http.client.CannotSendRequest:
       self.conn.close()

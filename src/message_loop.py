@@ -60,8 +60,8 @@ def _detect_toolkit():
   # try using gtk
   if can_have_gui:
     try:
-      import pygtk
-      pygtk.require('2.0')
+      import gi
+      gi.require_version('Gtk', '3.0')
       _toolkit = TOOLKIT_GTK
       return
     except ImportError:

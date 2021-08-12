@@ -13,8 +13,8 @@ from __future__ import print_function
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from builtins import str
-import glib
-import gtk
+import gi
+from gi.repository import Gtk, GObject
 import sys
 import unittest
 
@@ -54,7 +54,7 @@ def post_task(cb, *args):
     # timeouts that were enqueued when the mainloop exited should not run
     if _current_main_loop_instance == main_loop_instance_at_post:
       cb(*args)
-  glib.timeout_add(0, on_run)
+  GObject.timeout_add(0, on_run)
 
 def post_delayed_task(cb, delay, *args):
   init_main_loop()
@@ -64,7 +64,7 @@ def post_delayed_task(cb, delay, *args):
     if _current_main_loop_instance == main_loop_instance_at_post:
       cb(*args)
   timeout_ms = int(delay * 1000)
-  glib.timeout_add(timeout_ms, on_run)
+  GObject.timeout_add(timeout_ms, on_run)
 
 def set_unittests_running(running):
   global _unittests_running
@@ -96,7 +96,7 @@ def run_main_loop():
 
   try:
     _is_main_loop_running = True
-    gtk.main()
+    Gtk.main()
   finally:
     _is_main_loop_running = False
     _current_main_loop_instance += 1
@@ -121,5 +121,5 @@ def quit_main_loop():
       cb()
     del _quit_handlers[:]
 
-    gtk.main_quit()
+    Gtk.main_quit()
   post_task(do_quit)

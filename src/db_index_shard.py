@@ -17,15 +17,12 @@ from builtins import range
 from builtins import object
 import fnmatch
 import re
-import sys
 
 from .basename_ranker import BasenameRanker
 from trace_event import *
 
 class DBIndexShard(object):
   def __init__(self, basenames):
-    reload(sys)
-    sys.setdefaultencoding('utf8')
 
     # The basenames come out of a hashtable so they are usually pretty badly
     # shuffled around. Sort them here so that we get somewhat predictable results
@@ -61,7 +58,7 @@ class DBIndexShard(object):
     # now, order the actual entries so high qualities are at front
     self.basenames_by_wordstarts = {}
     for ws,items in wordstarts.items():
-      items.sort(lambda x,y: cmp(x[1],y[1]))
+      items.sort(key=lambda x:x[1])
       self.basenames_by_wordstarts[ws] = [i[0] for i in items]
 
   @traced

@@ -29,6 +29,7 @@ from .query import Query
 from .query_cache import QueryCache
 from .query_result import QueryResult
 from src import db_indexer
+from functools import total_ordering
 
 DEFAULT_IGNORES=[
   ".*",
@@ -40,10 +41,11 @@ DEFAULT_IGNORES=[
   "#*",
 ]
 
+@total_ordering
 class DBDir(object):
   def __init__(self, d):
     self.path = d
-    self.id = hashlib.md5(d).hexdigest()
+    self.id = hashlib.md5(d.encode('utf8')).hexdigest()
 
   def __repr__(self):
     return "DBDir(%s)" % self.path
@@ -52,10 +54,18 @@ class DBDir(object):
     return {"id": self.id,
             "path": self.path}
 
-  def __cmp__(self, other):
-    if type(other) != DBDir:
-      return 1
-    return cmp(self.path, other.path)
+  def __eq__(self, other):
+    if type(self) != type(other):
+      return False;
+    return self.path == other.path
+
+  def __ne__(self, other):
+    return not (self == other)
+
+  def __lt__(self, other):
+    if type(self) != type(other):
+      return False
+    return self.path < other.path
 
 class DB(object):
   def __init__(self, settings):

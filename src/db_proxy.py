@@ -138,7 +138,7 @@ class DBProxy(object):
 
     elif res.status != 200:
       raise Exception("On %s, got %s" % (path, res.status))
-    res = json.loads(res.read().encode('utf8'))
+    res = json.loads(res.read())
     return res
 
   def _get_dir(self, id, path):
@@ -224,13 +224,13 @@ class DBProxy(object):
     return self._req('POST', '/begin_reindex')
 
 
-class AsyncSearchError(object):
+class AsyncSearchError(BaseException):
   pass
 
 class AsyncSearch(object):
   def __init__(self, host, port, *args, **kwargs):
     """
-    Begins an asynchronous searche of the database.
+    Begins an asynchronous search of the database.
 
     host and port point to a running quickopend instance.
 
@@ -253,11 +253,11 @@ class AsyncSearch(object):
      if not self._result:
        res = self.async_conn.get_response()
        if res.status != 200:
-         self.async_conn.close()
+         #self.async_conn.close()
          self.async_conn = None
          raise_(AsyncSearchError, 'got status %i' % res.status)
        else:
          data = res.read()
-         res = json.loads(data.encode('utf8'))
+         res = json.loads(data)
          self._result = QueryResult.from_dict(res)
      return self._result
