@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,13 @@
 import curses
 from curses import ascii
 import math
-import message_loop
-import message_loop_curses
+from . import message_loop
+from . import message_loop_curses
 import time
 import os
-import basename_ranker
+from . import basename_ranker
 
-from open_dialog_base import OpenDialogBase
+from .open_dialog_base import OpenDialogBase
 
 def spad(s, w):
   if len(s) > w:

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +20,7 @@ import wx.lib.mixins.listctrl  as  listmix
 from wx.lib import evtmgr
 import sys
 
-from open_dialog_base import OpenDialogBase
+from .open_dialog_base import OpenDialogBase
 
 class TestListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
@@ -152,7 +153,7 @@ class OpenDialogWx(wx.Dialog, OpenDialogBase):
       r = ranks[i]
       base = os.path.basename(f)
       path = os.path.dirname(f)
-      i = self._results_list.InsertStringItem(sys.maxint, str(r))
+      i = self._results_list.InsertStringItem(sys.maxsize, str(r))
       self._results_list.SetStringItem(i, 1, base)
       self._results_list.SetStringItem(i, 2, path)
 

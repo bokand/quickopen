@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,8 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import temporary_daemon
-import async_http_connection
+from . import temporary_daemon
+from . import async_http_connection
 
 def AsyncHTTPConnectionTest(self):
   def setUp(self):
@@ -23,10 +25,10 @@ def AsyncHTTPConnectionTest(self):
     async_http_connection.begin_request('GET', '/')
     while not async_http_connection.is_response_ready():
       time.sleep(0.1)
-      print 'waiting...'
+      print('waiting...')
     res = async_http_connection.get_response()
-    print res.status
-    print res.read()
+    print(res.status)
+    print(res.read())
 
   def tearDown(self):
     self.daemon.close()

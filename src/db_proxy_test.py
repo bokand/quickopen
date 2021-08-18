@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import unittest
-import db_proxy
-import db_test_base
+from . import db_proxy
+from . import db_test_base
 import os
 import subprocess
 import tempfile
-import temporary_daemon
+from . import temporary_daemon
 import time
 
 class DBProxyTest(db_test_base.DBTestBase, unittest.TestCase):

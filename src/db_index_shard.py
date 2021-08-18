@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +16,7 @@ import fnmatch
 import re
 import sys
 
-from basename_ranker import BasenameRanker
+from .basename_ranker import BasenameRanker
 from trace_event import *
 
 class DBIndexShard(object):

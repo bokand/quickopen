@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,13 +13,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import prelaunch_client
+from . import prelaunch_client
 import os
 import subprocess
-import temporary_daemon
+from . import temporary_daemon
 import unittest
-import message_loop
-from quickopen_test_base import QuickopenTestBase
+from . import message_loop
+from .quickopen_test_base import QuickopenTestBase
 
 class PrelaunchTest(unittest.TestCase, QuickopenTestBase):
   def setUp(self):
@@ -41,7 +43,7 @@ class PrelaunchTest(unittest.TestCase, QuickopenTestBase):
                             stderr=subprocess.PIPE)
     (stdout, stderr) = proc.communicate()
     if len(stderr):
-      print "Error during %s:\n%s\n\n" % (args, stderr)
+      print("Error during %s:\n%s\n\n" % (args, stderr))
     return stdout
 
   def turn_off_daemon(self):

@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,7 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import prelaunch_client
+from . import prelaunch_client
 import os
 import sys
 
@@ -41,7 +43,7 @@ def run(prelaunch=False):
   try:
     __import__("trace_event")
   except:
-    print "Could not find py_trace_event. Did you forget 'git submodule update --init'?"
+    print("Could not find py_trace_event. Did you forget 'git submodule update --init'?")
     sys.exit(255)
 
   # Import python-daemon.
@@ -49,7 +51,7 @@ def run(prelaunch=False):
   try:
     __import__("daemon")
   except:
-    print "Could not find python-daemon. Did you forget 'git submodule update --init'?"
+    print("Could not find python-daemon. Did you forget 'git submodule update --init'?")
     sys.exit(255)
 
   # Import PyGithub.
@@ -57,7 +59,7 @@ def run(prelaunch=False):
   try:
     __import__("Github")
   except:
-    print "Could not find PyGithub. Did you forget 'git submodule update --init'?"
+    print("Could not find PyGithub. Did you forget 'git submodule update --init'?")
     sys.exit(255)
 
   mod = __import__(main_name, {}, {}, True)
@@ -93,7 +95,7 @@ def main(main_name):
   # prelaunch should bypass full bootstrap
   if prelaunch_client.is_prelaunch_client(sys.argv):
     # This is a lightweight import due to lazy initialization of the message loop.
-    import message_loop
+    from . import message_loop
     if message_loop.supports_prelaunch():
       return sys.exit(prelaunch_client.main(sys.argv))
 
@@ -112,7 +114,7 @@ def main(main_name):
       sys.exit(run())
 
     # Try using chrome.
-    import message_loop_chrome
+    from . import message_loop_chrome
     if message_loop_chrome.supported():
       sys.argv.insert(1, '--main-name')
       sys.argv.insert(2, main_name)
@@ -127,7 +129,7 @@ def main(main_name):
     try:
       import wx
     except ImportError:
-      if str(sys.exc_value).find("no appropriate 64-bit") != -1:
+      if str(sys.exc_info()[1]).find("no appropriate 64-bit") != -1:
         wx_found_but_failed = True
 
     if wx_found_but_failed:
@@ -156,7 +158,7 @@ def main(main_name):
         os.execv(args[0], args)
 
       # did we already try one of the tricks below? Bail out to prevent recursion...
-      print "Your system's python is 64 bit, and all the tricks we know to get it into 32b mode failed."
+      print("Your system's python is 64 bit, and all the tricks we know to get it into 32b mode failed.")
       sys.exit(255)
 
     else:

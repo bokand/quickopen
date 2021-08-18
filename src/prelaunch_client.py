@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +13,7 @@
 
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import default_port
+from . import default_port
 import os
 import sys
 import socket
@@ -62,7 +63,7 @@ def run_command_in_existing(daemon_host, daemon_port, args, auto_start=True):
     port = existing_quickopen_port()
   except socket.error:
     if not auto_start:
-      from db_status import DBStatus
+      from .db_status import DBStatus
       return "%s.\n" % DBStatus.not_running_string()
 
     # quickopend not started; attempt once to start it automatically
@@ -75,12 +76,12 @@ def run_command_in_existing(daemon_host, daemon_port, args, auto_start=True):
       sys.stderr = sys.stdout
 
       sys.path.append(os.path.join(os.path.dirname(__file__), "../third_party/py_trace_event/"))
-      import db_proxy
+      from . import db_proxy
       db_proxy.DBProxy.try_to_start_quickopend(daemon_port)
       try:
         port = existing_quickopen_port()
       except socket.error:
-        from db_status import DBStatus
+        from .db_status import DBStatus
         return "%s.\n" % DBStatus.not_running_string()
     finally:
       sys.stdout = orig_stdout

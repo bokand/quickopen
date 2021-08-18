@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,7 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import async_http_connection
+from future.utils import raise_
+from . import async_http_connection
 import httplib
 import os
 import socket
@@ -22,11 +24,11 @@ import json
 import urllib
 import urlparse
 
-from db_status import DBStatus
-from event import Event
+from .db_status import DBStatus
+from .event import Event
 from trace_event import *
-from query import Query
-from query_result import QueryResult
+from .query import Query
+from .query_result import QueryResult
 
 class DBDirProxy(object):
   def __init__(self, id, path):
@@ -75,7 +77,7 @@ class DBProxy(object):
       try:
         conn = httplib.HTTPConnection('localhost', port_for_autostart, True)
         conn.request('GET', '/ping')
-      except Exception, ex:
+      except Exception as ex:
         time.sleep(per_iter_delay)
         continue
 
@@ -240,14 +242,14 @@ class AsyncSearch(object):
   @property
   def result(self):
      if not self.async_conn:
-       raise AsyncSearchError, 'connection died during search'
+       raise AsyncSearchError('connection died during search')
 
      if not self._result:
        res = self.async_conn.get_response()
        if res.status != 200:
          self.async_conn.close()
          self.async_conn = None
-         raise AsyncSearchError, 'got status %i' % res.status
+raise_(AsyncSearchError, 'got status %i' % res.status)
        else:
          data = res.read()
          res = json.loads(data.encode('utf8'))

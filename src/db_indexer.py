@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,10 +27,10 @@ class DBIndexer(object):
     raise NotImplementedException()
 
 def Create(dirs, dir_cache):
-  import find_based_db_indexer
+  from . import find_based_db_indexer
   if find_based_db_indexer.Supported():
     return find_based_db_indexer.FindBasedDBIndexer(
       dirs, dir_cache.ignores)
 
-  import listdir_based_db_indexer
+  from . import listdir_based_db_indexer
   return listdir_based_db_indexer.ListdirBasedDBIndexer(dirs, dir_cache)

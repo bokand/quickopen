@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from __future__ import absolute_import
+from __future__ import print_function
 
 import daemon as python_daemon
 import httplib
@@ -54,14 +55,14 @@ def CMDrun(parser):
   """Runs the quickopen daemon"""
   (options, args) = parser.parse_args()
   if is_port_listening(options.host, options.port):
-    print "%s:%s in use. Try 'quickopend stop' first?" % (options.host, options.port)
+    print("%s:%s in use. Try 'quickopend stop' first?" % (options.host, options.port))
     return 255
   prelaunchdaemon = None
 
   if options.test:
     logging.info('Starting quickopen daemon on port %d', options.port)
   else:
-    print 'Starting quickopen daemon on port %d' % options.port
+    print('Starting quickopen daemon on port %d' % options.port)
 
   try:
     # Tests assume that quickopend created in the foreground
@@ -94,7 +95,7 @@ def CMDstatus(parser):
   """Gets the status of the quickopen daemon"""
   (options, args) = parser.parse_args()
   if not is_port_listening(options.host, options.port):
-    print "Not running"
+    print("Not running")
     return 255
 
   try:
@@ -102,16 +103,16 @@ def CMDstatus(parser):
     conn.request('GET', '/status')
     resp = conn.getresponse()
   except:
-    print "Not responding"
+    print("Not responding")
     return 255
 
   if resp.status != 200:
-    print "Service running on %s:%i is probaby not quickopend" % (options.host, options.port)
+    print("Service running on %s:%i is probaby not quickopend" % (options.host, options.port))
     return 255
 
   status_str = resp.read()
   status = json.loads(status_str)
-  print status["status"]
+  print(status["status"])
   return 0
 
 def CMDstop(parser):
@@ -122,19 +123,19 @@ def CMDstop(parser):
     conn.request('GET', '/exit')
     resp = conn.getresponse()
   except:
-    print "Not responding"
+    print("Not responding")
     return 255
 
   if resp.status != 200:
-    print "Service running on %s:%i is probaby not quickopend" % (options.host, options.port)
+    print("Service running on %s:%i is probaby not quickopend" % (options.host, options.port))
     return 255
 
   status_str = resp.read()
   status = json.loads(status_str)
   if status["status"] != "OK":
-    print "Stop failed with unexpected result %s" % status["status"]
+    print("Stop failed with unexpected result %s" % status["status"])
     return 255
-  print "Existing quickopend on %s:%i stopped" % (options.host, options.port)
+  print("Existing quickopend on %s:%i stopped" % (options.host, options.port))
   return 0
 
 def CMDrestart(parser):
@@ -151,7 +152,7 @@ def CMDrestart(parser):
     tries += 1
     time.sleep(0.1)
   if tries == 10:
-    print "Previous quickopend did not stop."
+    print("Previous quickopend did not stop.")
     return 255
   CMDrun(parser)
   return 0
@@ -247,7 +248,7 @@ def main(parser):
       return command(parser)
     else:
       # Not a known command. Default to help.
-      print "Unrecognized command: %s\n" % non_switch_args[0]
+      print("Unrecognized command: %s\n" % non_switch_args[0])
   else: # default command
     CMDrun.usage_more = ('\n\nCommands are:\n' + '\n'.join([
           '  %-10s %s' % (fn[3:], getdoc(Command(fn[3:])).split('\n')[0].strip())

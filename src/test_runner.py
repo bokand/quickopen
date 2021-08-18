@@ -12,10 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from __future__ import print_function
+from __future__ import absolute_import
 import fcntl
 import fnmatch
 import logging
-import message_loop
+from . import message_loop
 import optparse
 import os
 import platform
@@ -107,7 +109,7 @@ def discover(start_dir, pattern = "test*.py", top_level_dir = None):
       try:
         module = __import__(fqn,fromlist=[True])
       except:
-        print "While importing [%s]\n" % fqn
+        print("While importing [%s]\n" % fqn)
         traceback.print_exc()
         continue
       modules.append(module)
@@ -149,7 +151,7 @@ def main(parser):
     class DebuggingAssertionError(exceptions.AssertionError):
       def __init__(self, *args):
         exceptions.AssertionError.__init__(self, *args)
-        print "Assertion failed, entering PDB..."
+        print("Assertion failed, entering PDB...")
         import pdb
         if hasattr(sys, '_getframe'):
           pdb.Pdb().set_trace(sys._getframe().f_back.f_back)
@@ -170,7 +172,7 @@ def main(parser):
       pass
 
   if options.check_for_fd_leaks and not options.incremental:
-    print "--check-for-fd-leaks forces --incremental."
+    print("--check-for-fd-leaks forces --incremental.")
     options.incremental = True
 
   # make sure cwd is the base directory!
@@ -232,8 +234,8 @@ def main(parser):
     ok = True
     for t in get_tests_from_suite(selected_tests_suite):
       assert isinstance(t, unittest.TestCase)
-      print '----------------------------------------------------------------------'
-      print 'Running %s' % str(t)
+      print('----------------------------------------------------------------------')
+      print('Running %s' % str(t))
 
       res = r.run(t)
       if not res.wasSuccessful():

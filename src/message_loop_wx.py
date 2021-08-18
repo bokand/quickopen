@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +41,7 @@ def init_main_loop():
           _active_test_result.addFailure(_active_test, (exc, value, tb))
         else:
           if not str(value).startswith("_noprint"):
-            print "Untrapped exception! Exiting message loop with exception."
+            print("Untrapped exception! Exiting message loop with exception.")
           _active_test_result.addError(_active_test, (exc, value, tb))
         quit_main_loop()
         return

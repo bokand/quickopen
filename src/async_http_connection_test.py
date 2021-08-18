@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,8 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import async_http_connection
-import temporary_daemon
+from . import async_http_connection
+from . import temporary_daemon
 import unittest
 import time
 class AsyncHTTPConnectionTest(unittest.TestCase):

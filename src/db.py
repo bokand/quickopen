@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +17,15 @@ import logging
 import os
 import time
 
-from db_exception import DBException
-from db_shard_manager import DBShardManager
-from db_status import DBStatus
-from dir_cache import DirCache
-from event import Event
+from .db_exception import DBException
+from .db_shard_manager import DBShardManager
+from .db_status import DBStatus
+from .dir_cache import DirCache
+from .event import Event
 from trace_event import *
-from query import Query
-from query_cache import QueryCache
-from query_result import QueryResult
+from .query import Query
+from .query_cache import QueryCache
+from .query_result import QueryResult
 from src import db_indexer
 
 DEFAULT_IGNORES=[

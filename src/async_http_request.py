@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +42,7 @@ class AsyncHTTPConnection(object):
       try:
         self.conn.connect()
       except socket.error:
-        print 'died during connect'
+        print('died during connect')
         raise AsyncError()
 
   def begin_request(self, method, url, data = None):
@@ -59,7 +60,7 @@ class AsyncHTTPConnection(object):
       self.request_pending = True
     except httplib.CannotSendRequest:
       self.conn.close()
-      print 'died during begin_request'
+      print('died during begin_request')
       raise AsyncError()
 
   def is_response_ready(self):
@@ -71,9 +72,9 @@ class AsyncHTTPConnection(object):
       self.state = SOCKET_READABLE
       return True
     r,w,x = select.select([self.conn.sock.fileno(),], [], [])
-    print r
+    print(r)
     if len(r):
-      print "readable"
+      print("readable")
       self.state = SOCKET_READABLE
       return True
     else:
@@ -92,7 +93,7 @@ class AsyncHTTPConnection(object):
       r = self.conn.getresponse()
       return r
     except httplib.BadStatusLine:
-      print "lost during get response"
+      print("lost during get response")
       r = None
       self.status = IDLE
       self.conn.close()

@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,8 +92,8 @@ class BasenameRanker(object):
     if debug:
       debug_data = []
       ret = self._get_basic_rank_core(debug_data, self._memoized_basic_ranks, 0, query.lower(), 0, candidate, candidate.lower())
-      print "_get_basic_rank(%s, %s) -> (%s)" % (query, candidate, ret)
-      print "\n".join(debug_data)
+      print("_get_basic_rank(%s, %s) -> (%s)" % (query, candidate, ret))
+      print("\n".join(debug_data))
       return ret
     else:
       return self._get_basic_rank_core(None, self._memoized_basic_ranks, 0, query.lower(), 0, candidate, candidate.lower())

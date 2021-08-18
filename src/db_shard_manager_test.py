@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +20,8 @@ import time
 from src import db_shard_manager
 from src import mock_db_indexer
 
-from query import Query
-from query_cache import QueryCache
+from .query import Query
+from .query_cache import QueryCache
 
 class DBShardManagerTest(unittest.TestCase):
   def setUp(self,*args,**kwargs):
@@ -71,7 +73,7 @@ class DBShardManagerPerfTest():
     self.shard_manager = db_shard_manager.DBShardManager(mock_indexer)
 
   def test_matcher_perf(self,max_hits):
-    print "%15s %s" % ("query", "time")
+    print("%15s %s" % ("query", "time"))
 
     PERF_QUERIES = [
     'warmup',
@@ -105,10 +107,10 @@ class DBShardManagerPerfTest():
       start = time.time()
       self.shard_manager.search(q,max_hits)
       elapsed = time.time() - start
-      print '%15s %.3f' % (q ,elapsed)
+      print('%15s %.3f' % (q ,elapsed))
 
 if __name__ == '__main__':
   test = DBShardManagerPerfTest('test_data/cr_files_by_basename.json')
-  print "Results for max=30:"
+  print("Results for max=30:")
   test.test_matcher_perf(max_hits=30)
-  print "\n"
+  print("\n")

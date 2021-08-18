@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -108,7 +110,7 @@ def supports_prelaunch():
     return False
 
   # Try using chrome.
-  import message_loop_chrome
+  from . import message_loop_chrome
   if message_loop_chrome.supported():
     return False
 
@@ -173,5 +175,5 @@ def ensure_has_message_loop():
   _initialize_if_needed()
   if not _toolkit:
     supports = ['PyGtk', 'WxPython', 'Curses']
-    print """No supported GUI toolkit found. Trace_event_viewer supports %s.""" % ", ".join(supports)
+    print("""No supported GUI toolkit found. Trace_event_viewer supports %s.""" % ", ".join(supports))
     sys.exit(255)

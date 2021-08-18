@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2012 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import copy
-import fixed_size_dict
+from . import fixed_size_dict
 import os
 import sys
 import time
 
-from basename_ranker import BasenameRanker
-from query_result import QueryResult
+from .basename_ranker import BasenameRanker
+from .query_result import QueryResult
 from trace_event import *
 
 def _is_in_base_path(filename, base_path):
@@ -92,7 +93,7 @@ def _apply_global_rank_adjustment(base_result, indexed_dirs, query):
     for d,order in active_dir_orders:
       if f.startswith(d):
         return order
-    return sys.maxint
+    return sys.maxsize
 
   def hit_cmp(x,y):
     # directory order trumps everything

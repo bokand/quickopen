@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,8 @@
 # limitations under the License.
 import time
 import unittest
-from dir_cache import DirCache
-from test_data import TestData
+from .dir_cache import DirCache
+from .test_data import TestData
 
 class DirCacheTest(unittest.TestCase):
   def setUp(self):

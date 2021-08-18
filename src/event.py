@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,10 +46,10 @@ class Event(object):
     for cb in self._listeners:
       try:
         last = cb(*args)
-      except Exception,e:
+      except Exception as e:
         if not silent:
-          print "Error on callback:"
+          print("Error on callback:")
           traceback.print_stack()
           traceback.print_exc()
-          print "\n\n"
+          print("\n\n")
     return last

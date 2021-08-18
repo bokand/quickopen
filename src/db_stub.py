@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,14 +12,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import daemon
-import db
+from . import daemon
+from . import db
 import re
 import time
 import urlparse
 
 from trace_event import *
-from query import Query
+from .query import Query
 
 
 # TODO(nduca): is Stub the right word for this class? Mehh

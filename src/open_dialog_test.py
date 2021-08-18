@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,13 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import db_test_base
-import open_dialog
+from . import db_test_base
+from . import open_dialog
 import os
-import message_loop
+from . import message_loop
 import tempfile
-import temporary_daemon
-import ui_test_case
+from . import temporary_daemon
+from . import ui_test_case
 
 # Special indicator to TestRunner to only let us run when
 # run_unit_tests is passed -m from the commandline.

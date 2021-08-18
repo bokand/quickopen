@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,7 @@
 import gtk
 import pango
 
-from event import *
+from .event import *
 
 
 class InfoBarGtk(gtk.EventBox):

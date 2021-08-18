@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import curses
-import event
+from . import event
 import select
 import sys
 import time
@@ -64,16 +66,16 @@ def get_stdscr():
 def _on_exception():
   import traceback
   traceback.print_exc()
-  print "exception"
+  print("exception")
   return
   #exc, value, tb = sys.exc_info()
   if is_main_loop_running() and _active_test:
     if isinstance(value,unittest.TestCase.failureException):
-      print "hook"
+      print("hook")
       _active_test_result.addFailure(_active_test, (exc, value, tb))
     else:
       if not str(value).startswith("_noprint"):
-        print "Untrapped exception! Exiting message loop with exception."
+        print("Untrapped exception! Exiting message loop with exception.")
       _active_test_result.addError(_active_test, (exc, value, tb))
     quit_main_loop()
     return
@@ -169,7 +171,7 @@ def run_main_loop():
         if on_terminal_readable.has_listeners:
           on_terminal_readable.fire()
         else:
-          print "unhandled character:", _stdscr.getch()
+          print("unhandled character:", _stdscr.getch())
       _run_pending_tasks()
   try:
     _main_loop_running = True

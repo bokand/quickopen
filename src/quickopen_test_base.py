@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import os
-import temporary_daemon
+from . import temporary_daemon
 import unittest
 import subprocess
-import test_data
+from . import test_data
 import time
 import re
 

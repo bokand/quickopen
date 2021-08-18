@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,27 +13,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import default_port
+from . import default_port
 import logging
-import message_loop
+from . import message_loop
 import optparse
 import os
 import platform
-import prelaunch
+from . import prelaunch
 import re
 import shlex
 import subprocess
 import sys
 
-from db_exception import DBException
-from db_status import DBStatus
-from query import Query
+from .db_exception import DBException
+from .db_status import DBStatus
+from .query import Query
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "../third_party/py_trace_event/"))
 try:
   from trace_event import *
 except:
-  print "Could not find py_trace_event. Did you forget 'git submodule update --init'"
+  print("Could not find py_trace_event. Did you forget 'git submodule update --init'")
   sys.exit(255)
 
 import src.db_proxy
@@ -48,9 +50,9 @@ def CMDadd(parser):
   for d in args:
     try:
       db.add_dir(d)
-    except DBException, ex:
+    except DBException as ex:
       ok = False
-      print ex.args[0]
+      print(ex.args[0])
   if not ok:
     return 255
   return 0
@@ -61,7 +63,7 @@ def CMDdirs(parser):
   db = open_db(options)
   if len(args):
     parser.error('Unrecognized args: %s' % ' '.join(args))
-  print "\n".join([x.path for x in db.dirs])
+  print("\n".join([x.path for x in db.dirs]))
   return 0
 
 def CMDrmdir(parser):
@@ -81,11 +83,11 @@ def CMDrmdir(parser):
         same = False
       if same:
         db.delete_dir(dmap[k])
-        print "%s removed" % dmap[k].path
+        print("%s removed" % dmap[k].path)
         found = True
         break
     if not found:
-      print "%s is not indexed." % d
+      print("%s is not indexed." % d)
       ok = False
   if ok:
     return 0
@@ -107,7 +109,7 @@ def CMDignores(parser):
   db = open_db(options)
   if len(args):
     parser.error('Unrecognized args: %s' % ' '.join(args))
-  print "\n".join(db.ignores)
+  print("\n".join(db.ignores))
   return 0
 
 def CMDunignore(parser):
@@ -119,10 +121,10 @@ def CMDunignore(parser):
   for i in args:
     if i not in ignores:
       ok = False
-      print "%s not found" % i
+      print("%s not found" % i)
     else:
       db.unignore(i)
-      print "%s removed" % i
+      print("%s removed" % i)
   if ok:
     return 0
   return 255
@@ -136,7 +138,7 @@ def CMDsearch(parser):
   """Search for a file"""
   if prelaunch.is_prelaunched_process() and (
     not message_loop.supports_prelaunch()):
-    print "Prelaunching not available for current UI."
+    print("Prelaunching not available for current UI.")
     return 255
 
   parser.add_option('--ok', dest='ok', action='store_true', default=False, help='Output "OK" before results')
@@ -157,7 +159,7 @@ def CMDsearch(parser):
 
   def print_results(res, canceled):
     if options.ok and not canceled:
-      print "OK"
+      print("OK")
 
     if options.results_file:
       ofile = open(options.results_file, 'w')
@@ -206,7 +208,7 @@ def CMDstatus(parser):
   """Checks the status of the quick open database"""
   (options, args) = parser.parse_args()
   db = open_db(options)
-  print "%s." % db.status().status
+  print("%s." % db.status().status)
 
 def CMDreindex(parser):
   """Begins to reindex the quickopen database"""
@@ -214,9 +216,9 @@ def CMDreindex(parser):
   db = open_db(options)
   try:
     db.begin_reindex()
-    print "Reindexing has begun."
+    print("Reindexing has begun.")
   except IOError:
-    print "%s." % DBStatus.not_running_string()
+    print("%s." % DBStatus.not_running_string())
 
 def CMDrawsearch(parser):
   """Prints the raw database's results for <query>"""
@@ -230,7 +232,7 @@ def CMDrawsearch(parser):
   if len(args) != 1:
     parser.error('Expected: <query>')
   if not db.has_index:
-    print "Database is not fully indexed. Wait a bit or try quickopen status"
+    print("Database is not fully indexed. Wait a bit or try quickopen status")
     return 255
 
   search_args = {}
@@ -245,12 +247,12 @@ def CMDrawsearch(parser):
   res = db.search(q)
   if options.debug:
     import pprint
-    print pprint.pprint(res.as_dict())
+    print(pprint.pprint(res.as_dict()))
   elif options.show_rank:
     combined = res.hits
-    print "\n".join(["%i,%s" % (c[1],c[0]) for c in combined])
+    print("\n".join(["%i,%s" % (c[1],c[0]) for c in combined]))
   else:
-    print "\n".join([x for x in res.filenames])
+    print("\n".join([x for x in res.filenames]))
 
   if len(res.filenames) > 0:
     return 0
@@ -270,7 +272,7 @@ def CMDedit(parser):
 
   db = open_db(options)
   if not db.has_index:
-    print "Database is not fully indexed. Wait a bit or try quickopen status"
+    print("Database is not fully indexed. Wait a bit or try quickopen status")
     return 255
 
   def edit(filenames, canceled):
@@ -308,7 +310,7 @@ def CMDprelaunch(parser):
   """Performs a quickopen command in a prelaunched instance. Reduces delay in seeing the initial search dialog."""
   args = sys.argv[1:]
   if not "--wait" in args:
-    print "Error: prelaunch command must have a --wait in it if it got this far. There must be a bug in the bootstrap."
+    print("Error: prelaunch command must have a --wait in it if it got this far. There must be a bug in the bootstrap.")
 
   parser.add_option("--wait", action="store_true", dest="wait")
   parser.add_option("--control-port", action="store", dest="control_port")
@@ -319,22 +321,22 @@ def CMDprelaunch(parser):
 
 def CMDoauth(parser):
   """Requests GitHub Oauth credentials for adding bug reports"""
-  import oauth
+  from . import oauth
 
   (options, args) = parser.parse_args()
   db = open_db(options)
   token = db.get_oauth()
   if token:
-    print "Oauth token already cached"
+    print("Oauth token already cached")
     return 0
 
   token = oauth.request_oauth_token()
   if not token:
-    print "Failed to request Oauth token from GitHub"
+    print("Failed to request Oauth token from GitHub")
     return 255
 
   db.set_oauth(token)
-  print "Cached Oauth token"
+  print("Cached Oauth token")
   return 0
 
 @traced
@@ -420,7 +422,7 @@ def main(parser):
       return command(parser)
     else:
       # Not a known command. Default to help.
-      print "Unrecognized command: %s\n" % non_switch_args[0]
+      print("Unrecognized command: %s\n" % non_switch_args[0])
   else: # default command
     CMDsearch.usage_more = ('\n\nCommands are:\n' + '\n'.join([
           '  %-10s %s' % (fn[3:], getdoc(Command(fn[3:])).split('\n')[0].strip())

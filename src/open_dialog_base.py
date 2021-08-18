@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +12,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import db_proxy
+from . import db_proxy
 import json
 import logging
-import message_loop
+from . import message_loop
 import re
 import os
-import query
+from . import query
 import sys
 import time
 
-from db_status import DBStatus
+from .db_status import DBStatus
 from trace_event import *
 
 TICK_RATE_WHEN_SEARCHING = 0.005

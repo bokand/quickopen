@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +14,10 @@
 # limitations under the License.
 import os
 import sys
-import message_loop
+from . import message_loop
 
 import chromeapp
-import db_proxy
+from . import db_proxy
 
 class OpenDialogChrome():
   def __init__(self, options, db, initial_filter):

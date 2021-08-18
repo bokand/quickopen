@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,9 +23,9 @@ import urlparse
 import BaseHTTPServer
 import time
 
-from event import Event
+from .event import Event
 from trace_event import *
-from silent_exception import *
+from .silent_exception import *
 
 """
 Exception that you can throw in a handler that will trigger a 404 response.
@@ -89,7 +90,7 @@ class _RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         try:
           resp = route.handler(match, verb, obj)
           self.send_result(route, resp)
-        except Exception, ex:
+        except Exception as ex:
           if not isinstance(ex,SilentException):
             traceback.print_exc()
           try:
@@ -151,7 +152,7 @@ class Daemon(BaseHTTPServer.HTTPServer):
     self.add_json_route('/exit', self.on_exit, ['POST', 'GET'])
 
     if test_mode:
-      import daemon_test
+      from . import daemon_test
       daemon_test.add_test_handlers_to_daemon(self)
 
   def on_exit(self, m, verb, data):

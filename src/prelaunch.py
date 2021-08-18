@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +30,7 @@ import httplib
 import time
 import StringIO
 
-from db_status import DBStatus
+from .db_status import DBStatus
 from trace_event import *
 
 _is_prelaunched_process = False
@@ -72,7 +73,7 @@ def wait_for_command(control_port):
     # main now, and redirect the stdout output over to the prelauncher.
     # We do this by overriding stdout to a StringIO. It works, though
     # we could technically do better.
-    import quickopen
+    from . import quickopen
     import optparse
     old_stdout = sys.stdout
     new_stdout = StringIO.StringIO()

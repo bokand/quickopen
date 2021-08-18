@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,12 +14,12 @@
 # limitations under the License.
 import os
 import unittest
-import query
+from . import query
 
-from basename_ranker import BasenameRanker
-from query import Query
-from query_cache import QueryCache
-from query_result import QueryResult
+from .basename_ranker import BasenameRanker
+from .query import Query
+from .query_cache import QueryCache
+from .query_result import QueryResult
 
 def make_result(hits):
   res = QueryResult()

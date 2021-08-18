@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,10 +13,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import message_loop
+from . import message_loop
 import unittest
 
-from ui_test_case import *
+from .ui_test_case import *
 
 """
 The tests below follow the basic pattern:
@@ -53,9 +55,9 @@ class UITestCaseTest(unittest.TestCase):
     test.run(result)
     if not result.wasSuccessful():
       for t, e in result.errors:
-        print e
+        print(e)
       for t, e in result.failures:
-        print e
+        print(e)
     self.assertTrue(result.wasSuccessful())
 
   def test_test_that_fails_inside_message_loop(self):

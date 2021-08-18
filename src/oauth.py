@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Copyright 2012 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +20,8 @@ import GithubException
 def request_oauth_token():
   """ Prompts user for credentials and returns Oauth token from GitHub """
 
-  print "Requesting an oauth token from GitHub."
-  print "Your username and password will not be stored."
+  print("Requesting an oauth token from GitHub.")
+  print("Your username and password will not be stored.")
 
   username = raw_input("GitHub Username: ")
   password = getpass.getpass("GitHub Password: ")
@@ -31,5 +32,5 @@ def request_oauth_token():
     auth = user.create_authorization(scopes=["public_repo"],note="quickopen")
     return auth.token
   except GithubException.GithubException as e:
-    print "Error: " + str(e)
+    print("Error: " + str(e))
     return None

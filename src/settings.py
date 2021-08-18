@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,7 @@
 # limitations under the License.
 import os
 import logging
-import pson
+from . import pson
 
 class SettingExistsException(Exception):
   def __init__(self,k):
@@ -98,7 +99,7 @@ class Settings(object):
       import stat
       os.chmod(self._settings_file, stat.S_IREAD | stat.S_IWRITE)
     flags = os.O_WRONLY | os.O_CREAT
-    with os.fdopen(os.open(self._settings_file, flags, 0600), "w") as f:
+    with os.fdopen(os.open(self._settings_file, flags, 0o600), "w") as f:
       # only dump the ones that arent in used_default
       vals = {}
       for k in self._values.keys():
@@ -108,10 +109,10 @@ class Settings(object):
       f.write(s)
 
   def has_setting(self, k):
-    return self._types.has_key(k)
+    return k in self._types
 
   def register(self,k,ty,default,change_fn=None):
-    if self._types.has_key(k):
+    if k in self._types:
       if self._types[k] != ty:
         raise Exception("Setting %s is already registered as type %s" % (k, ty))
       return
@@ -119,8 +120,8 @@ class Settings(object):
       raise Exception("type %s is not the same as default's type %s" % (ty, type(default)))
     self._types[k] = ty
     self._change_fns[k] = change_fn
-    assert(not self._values.has_key(k))
-    if self._unresolved_values.has_key(k):
+    assert(k not in self._values)
+    if k in self._unresolved_values:
       v = self._unresolved_values[k]
       if isinstance(v,self._types[k]) == False:
 #        logging.error("Type mismatch on %s setting. Registered as %s but setting file contains %s", k, self._types[k], type(v))
@@ -134,7 +135,7 @@ class Settings(object):
       self._used_default.add(k)
 
   def is_manually_set(self, k):
-    if self._temp_values.has_key(k):
+    if k in self._temp_values:
       return True
     else:
       return (k in self._used_default) == False
@@ -143,21 +144,21 @@ class Settings(object):
     return len(self._unresolved_values) != 0
 
   def __getattr__(self,k):
-    if self.__dict__.has_key(k):
+    if k in self.__dict__:
       return self.__dict__[k]
-    elif self._temp_values.has_key(k):
+    elif k in self._temp_values:
       return self._temp_values[k]
-    elif self._values.has_key(k):
+    elif k in self._values:
       return self._values[k]
     raise SettingDoesntExistException(k)
 
   def __setattr__(self, k, v):
-    if self.__dict__.has_key("_initialized") == False:
+    if ("_initialized" in self.__dict__) == False:
       return object.__setattr__(self,k,v)
-    elif self.__dict__.has_key(k):
+    elif k in self.__dict__:
       return object.__setattr__(self,k,v)
     else:
-      if self._types.has_key(k) == False:
+      if (k in self._types) == False:
         raise SettingDoesntExistException(k)
       if type(v) != self._types[k]:
         raise TypeError()
@@ -181,13 +182,13 @@ class Settings(object):
     self.__setattr__(k,v)
 
   def set_temporarily(self,k,v):
-    if self._types.has_key(k) == False:
+    if (k in self._types) == False:
       raise SettingDoesntExistException(k)
     if type(v) != self._types[k]:
       raise TypeError()
     self._temp_values[k] = v
 
   def unset_temporarily(self,k,v):
-    if self._temp_values.has_key(k) == False:
+    if (k in self._temp_values) == False:
       raise SettingDoesntExistException("%s is not temporarily set." % k)
     del self._temp_values[k]
