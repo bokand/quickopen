@@ -249,7 +249,7 @@ class AsyncSearch(object):
        if res.status != 200:
          self.async_conn.close()
          self.async_conn = None
-raise_(AsyncSearchError, 'got status %i' % res.status)
+         raise_(AsyncSearchError, 'got status %i' % res.status)
        else:
          data = res.read()
          res = json.loads(data.encode('utf8'))
