@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from __future__ import division
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,9 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import range
+from builtins import object
+from past.utils import old_div
 from . import db_index_shard
 import multiprocessing
 
@@ -43,7 +47,7 @@ class DBShardManager(object):
     self.dirs = indexer.dirs
     self.files = []
     self.files_by_lower_basename = dict()
-    for basename,files_with_basename in indexer.files_by_basename.items():
+    for basename,files_with_basename in list(indexer.files_by_basename.items()):
       lower_basename = basename.lower()
       if lower_basename in self.files_by_lower_basename:
         self.files_by_lower_basename[lower_basename].extend(files_with_basename)
@@ -65,7 +69,7 @@ class DBShardManager(object):
 
   def _make_chunks(self, items, N):
     base = 0
-    chunksize = len(items) / N
+    chunksize = old_div(len(items), N)
     if chunksize == 0:
       chunksize = 1
     chunks = []

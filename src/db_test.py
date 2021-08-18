@@ -35,7 +35,7 @@ class DBTest(DBTestBase, unittest.TestCase):
 
     settings2 = settings.Settings(self.settings_file.name)
     db2 = db.DB(settings2)
-    self.assertEquals([d1], map(lambda d: d.path, db2.dirs))
+    self.assertEquals([d1], [d.path for d in db2.dirs])
 
   def test_search_unsync(self):
     self.db.add_dir(self.test_data_dir)

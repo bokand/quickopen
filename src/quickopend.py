@@ -14,8 +14,11 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import daemon as python_daemon
-import httplib
+import http.client
 import json
 import logging
 import sys
@@ -31,7 +34,7 @@ import src.prelaunchd
 
 from trace_event import *
 
-class ForegroundDaemonContext:
+class ForegroundDaemonContext(object):
   def __enter__(self):
     pass
   def __exit__(self, exec_type, exec_value, traceback):
@@ -99,7 +102,7 @@ def CMDstatus(parser):
     return 255
 
   try:
-    conn = httplib.HTTPConnection(options.host, options.port, True)
+    conn = http.client.HTTPConnection(options.host, options.port, True)
     conn.request('GET', '/status')
     resp = conn.getresponse()
   except:
@@ -119,7 +122,7 @@ def CMDstop(parser):
   """Gets the status of the quickopen daemon"""
   (options, args) = parser.parse_args()
   try:
-    conn = httplib.HTTPConnection(options.host, options.port, True)
+    conn = http.client.HTTPConnection(options.host, options.port, True)
     conn.request('GET', '/exit')
     resp = conn.getresponse()
   except:

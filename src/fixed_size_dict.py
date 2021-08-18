@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import object
 class _LinkedListNode(object):
   def __init__(self, d):
     self.prev = None
@@ -22,7 +23,7 @@ class _LinkedListNode(object):
       pd = self.prev.data
     else:
       pd = "None"
-    if self.next:
+    if self.__next__:
       nd = self.next.data
     else:
       nd = "None"
@@ -41,7 +42,7 @@ class _LinkedList(object):
     ret = []
     while n:
       ret.append(n.data)
-      n = n.next
+      n = n.__next__
     return ret
 
   def __repr__(self):
@@ -81,8 +82,8 @@ class _LinkedList(object):
     else:
       new_node = _LinkedListNode(d)
     new_node.prev = node
-    new_node.next = node.next
-    if node.next == None:
+    new_node.next = node.__next__
+    if node.__next__ == None:
       self.tail = new_node
     else:
       node.next.prev = new_node
@@ -97,11 +98,11 @@ class _LinkedList(object):
 
   def remove(self, n):
     if n.prev == None:
-      self.head = n.next
+      self.head = n.__next__
     else:
-      n.prev.next = n.next
+      n.prev.next = n.__next__
 
-    if n.next == None:
+    if n.__next__ == None:
        self.tail = n.prev
     else:
        n.next.prev = n.prev

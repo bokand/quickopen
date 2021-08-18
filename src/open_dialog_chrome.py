@@ -12,6 +12,7 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import object
 import os
 import sys
 from . import message_loop
@@ -19,7 +20,7 @@ from . import message_loop
 import chromeapp
 from . import db_proxy
 
-class OpenDialogChrome():
+class OpenDialogChrome(object):
   def __init__(self, options, db, initial_filter):
     manifest_file = os.path.join(os.path.dirname(__file__),
                                  'chrome_app', 'manifest.json')

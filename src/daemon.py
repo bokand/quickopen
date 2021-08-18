@@ -12,6 +12,10 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import cmp
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import heapq
 import json
 import logging
@@ -19,8 +23,8 @@ import re
 import select
 import sys
 import traceback
-import urlparse
-import BaseHTTPServer
+import urllib.parse
+import http.server
 import time
 
 from .event import Event
@@ -34,9 +38,9 @@ class NotFoundException(Exception):
   def __init__(self,*args):
     Exception.__init__(self, *args)
 
-class _RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class _RequestHandler(http.server.BaseHTTPRequestHandler):
   def __init__(self, request, client_address, server):
-    BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+    http.server.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
     self.server = server
 
   def send_json(self, obj, resp_code=200, resp_code_str='OK'):
@@ -61,7 +65,7 @@ class _RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     logging.info(format, *args)
 
   def handleRequest(self, verb):
-    s = urlparse.urlsplit(self.path)
+    s = urllib.parse.urlsplit(self.path)
     if len(s[3]):
       path = "%s?%s" % (s[2], s[3])
     else:
@@ -140,9 +144,9 @@ class _Timeout(object):
   def __cmp__(self, that):
     return cmp(self.deadline, that.deadline)
 
-class Daemon(BaseHTTPServer.HTTPServer):
+class Daemon(http.server.HTTPServer):
   def __init__(self, test_mode, *args):
-    BaseHTTPServer.HTTPServer.__init__(self, *args)
+    http.server.HTTPServer.__init__(self, *args)
     self.port_ = args[0][1]
     self.routes = []
     self.test_mode = test_mode

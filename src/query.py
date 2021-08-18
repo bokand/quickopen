@@ -12,6 +12,9 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import cmp
+from builtins import range
+from builtins import object
 import copy
 from . import fixed_size_dict
 import os
@@ -87,7 +90,7 @@ def _apply_global_rank_adjustment(base_result, indexed_dirs, query):
   inactive_dirs.sort()
   for i in inactive_dirs:
     active_dir_orders[i] = len(active_dir_orders)
-  active_dir_orders = [(x,y) for x,y in active_dir_orders.items()]
+  active_dir_orders = [(x,y) for x,y in list(active_dir_orders.items())]
 
   def get_order(f):
     for d,order in active_dir_orders:

@@ -13,6 +13,8 @@ from __future__ import print_function
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from builtins import input
+from builtins import str
 import getpass
 import Github
 import GithubException
@@ -23,7 +25,7 @@ def request_oauth_token():
   print("Requesting an oauth token from GitHub.")
   print("Your username and password will not be stored.")
 
-  username = raw_input("GitHub Username: ")
+  username = input("GitHub Username: ")
   password = getpass.getpass("GitHub Password: ")
 
   try:

@@ -12,13 +12,15 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future import standard_library
+standard_library.install_aliases()
 from . import daemon as daemon_module
-import httplib
+import http.client
 import json
 from . import temporary_daemon
 import time
 import unittest
-import urlparse
+import urllib.parse
 
 class DaemonTest(unittest.TestCase):
   def setUp(self):
@@ -108,7 +110,7 @@ def add_test_handlers_to_daemon(daemon):
   daemon.add_json_route('/test_simple', handler_for_simple, ['GET','POST'])
 
   def handler_for_query(m, verb, data = None):
-    return urlparse.urlparse(m.group(0)).query
+    return urllib.parse.urlparse(m.group(0)).query
   daemon.add_json_route('/test_query(.*)', handler_for_query, ['GET'])
 
   def handler_for_complex(m, verb, data = None):

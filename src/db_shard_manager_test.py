@@ -13,6 +13,8 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import range
+from builtins import object
 import sys
 import unittest
 import time
@@ -66,7 +68,7 @@ class DBShardManagerTest(unittest.TestCase):
   def tearDown(self):
     self.shard_manager.close()
 
-class DBShardManagerPerfTest():
+class DBShardManagerPerfTest(object):
   def __init__(self, testfile):
     files_by_basename = json.load(open(filename))
     mock_indexer = mock_db_indexer.MockDBIndexer(files_by_basename = files_by_basename)

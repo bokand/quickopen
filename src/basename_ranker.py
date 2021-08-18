@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import division
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,9 @@ from __future__ import print_function
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import re
 import os
 import math
@@ -86,7 +90,7 @@ class BasenameRanker(object):
     #querybase = os.path.splitext(query)[0]
     #if querybase == candidatebase:
     #  rank *= 2
-    return math.floor(rank*10) / 10;
+    return old_div(math.floor(rank*10), 10);
 
   def _get_basic_rank(self, query, candidate, debug = False):
     if debug:

@@ -12,6 +12,9 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import cmp
+from builtins import range
+from builtins import object
 import fnmatch
 import re
 import sys
@@ -39,7 +42,7 @@ class DBIndexShard(object):
     # concatenated together. This is what we will use to handle fuzzy queries.
     self.basenames_unsplit = (u"\n" + u"\n".join(basenames) + u"\n")
     self.lower_basenames_unsplit = (u"\n" + u"\n".join(lower_basenames) + u"\n")
-    assert type(self.lower_basenames_unsplit) == unicode
+    assert type(self.lower_basenames_unsplit) == str
 
     self._basename_ranker = BasenameRanker()
     wordstarts = {}
@@ -57,7 +60,7 @@ class DBIndexShard(object):
 
     # now, order the actual entries so high qualities are at front
     self.basenames_by_wordstarts = {}
-    for ws,items in wordstarts.iteritems():
+    for ws,items in wordstarts.items():
       items.sort(lambda x,y: cmp(x[1],y[1]))
       self.basenames_by_wordstarts[ws] = [i[0] for i in items]
 

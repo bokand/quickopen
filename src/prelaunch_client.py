@@ -13,11 +13,15 @@ from __future__ import absolute_import
 
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
 from . import default_port
 import os
 import sys
 import socket
-import httplib
+import http.client
 import time
 
 # Keep imports to a minimum in this file. This is the critial path for a
@@ -50,7 +54,7 @@ def run_command_in_existing(daemon_host, daemon_port, args, auto_start=True):
       display = 'terminal';
 
   def existing_quickopen_port():
-      conn = httplib.HTTPConnection(daemon_host, daemon_port, True)
+      conn = http.client.HTTPConnection(daemon_host, daemon_port, True)
       conn.request('GET', '/existing_quickopen/%s' % display)
       res = conn.getresponse()
       assert res.status == 200
@@ -67,12 +71,12 @@ def run_command_in_existing(daemon_host, daemon_port, args, auto_start=True):
       return "%s.\n" % DBStatus.not_running_string()
 
     # quickopend not started; attempt once to start it automatically
-    import StringIO
+    import io
     try:
       # Squelch any output from starting the db
       orig_stdout = sys.stdout
       orig_stderr = sys.stderr
-      sys.stdout = StringIO.StringIO()
+      sys.stdout = io.StringIO()
       sys.stderr = sys.stdout
 
       sys.path.append(os.path.join(os.path.dirname(__file__), "../third_party/py_trace_event/"))

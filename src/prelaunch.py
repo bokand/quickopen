@@ -23,12 +23,15 @@ from __future__ import absolute_import
 # When a new quickopen comes around with a --use-prelaunch, it consults
 # the daemon for prelaunched instance handle and then delegates its actual
 # commandline to that instance (via magic).
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
 import os
 import socket
 import sys
-import httplib
+import http.client
 import time
-import StringIO
+import io
 
 from .db_status import DBStatus
 from trace_event import *
@@ -76,7 +79,7 @@ def wait_for_command(control_port):
     from . import quickopen
     import optparse
     old_stdout = sys.stdout
-    new_stdout = StringIO.StringIO()
+    new_stdout = io.StringIO()
     sys.stdout = new_stdout
     old_argv = sys.argv
     try:

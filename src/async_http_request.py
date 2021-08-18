@@ -12,7 +12,10 @@ from __future__ import print_function
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import httplib
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+import http.client
 import select
 import time
 import socket
@@ -34,7 +37,7 @@ SOCKET_READABLE = 'socket_readable'
 
 class AsyncHTTPConnection(object):
   def __init__(self, host, port):
-    self.conn = httplib.HTTPConnection(host, port)
+    self.conn = http.client.HTTPConnection(host, port)
     self.status = IDLE
 
   def connect(self):
@@ -58,7 +61,7 @@ class AsyncHTTPConnection(object):
       self.conn.endheaders()
       self.conn.send(text)
       self.request_pending = True
-    except httplib.CannotSendRequest:
+    except http.client.CannotSendRequest:
       self.conn.close()
       print('died during begin_request')
       raise AsyncError()
@@ -92,7 +95,7 @@ class AsyncHTTPConnection(object):
     try:
       r = self.conn.getresponse()
       return r
-    except httplib.BadStatusLine:
+    except http.client.BadStatusLine:
       print("lost during get response")
       r = None
       self.status = IDLE

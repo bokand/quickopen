@@ -12,6 +12,8 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import str
+from builtins import range
 import time
 import logging
 import os
@@ -208,4 +210,4 @@ class OpenDialogWx(wx.Dialog, OpenDialogBase):
     return all
 
   def get_selected_items(self):
-    return map(lambda i: self._cur_results[i], self.get_selected_indices())
+    return [self._cur_results[i] for i in self.get_selected_indices()]

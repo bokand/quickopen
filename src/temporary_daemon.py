@@ -12,8 +12,13 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import object
 from . import db_proxy
-import httplib
+import http.client
 import json
 import logging
 import subprocess
@@ -39,7 +44,7 @@ class TemporaryDaemon(object):
       for i in range(2):
         logging.warn("Existing daemon found. Asking it to exit")
         try:
-          conn = httplib.HTTPConnection('localhost', TEST_PORT, True)
+          conn = http.client.HTTPConnection('localhost', TEST_PORT, True)
           conn.request('GET', '/exit')
         except:
           break
@@ -60,7 +65,7 @@ class TemporaryDaemon(object):
     ok = False
     for i in range(10):
       try:
-        conn = httplib.HTTPConnection('localhost', TEST_PORT, True)
+        conn = http.client.HTTPConnection('localhost', TEST_PORT, True)
         conn.request('GET', '/ping')
       except:
         time.sleep(0.1)
@@ -83,7 +88,7 @@ class TemporaryDaemon(object):
 
   def close(self):
     try:
-      conn = httplib.HTTPConnection('localhost', TEST_PORT, True)
+      conn = http.client.HTTPConnection('localhost', TEST_PORT, True)
       conn.request('GET', '/exit')
     except:
       pass
@@ -101,7 +106,7 @@ class TemporaryDaemon(object):
   @property
   def conn(self):
     if not self._conn:
-      self._conn = httplib.HTTPConnection(self.host, self.port, True)
+      self._conn = http.client.HTTPConnection(self.host, self.port, True)
     return self._conn
 
   @property

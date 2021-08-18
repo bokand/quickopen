@@ -12,6 +12,7 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import object
 import os
 import logging
 from . import pson
@@ -102,7 +103,7 @@ class Settings(object):
     with os.fdopen(os.open(self._settings_file, flags, 0o600), "w") as f:
       # only dump the ones that arent in used_default
       vals = {}
-      for k in self._values.keys():
+      for k in list(self._values.keys()):
         if k not in self._used_default:
           vals[k] = self._values[k]
       s = pson.dumps(vals,pretty=True)

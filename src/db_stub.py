@@ -12,11 +12,15 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 from . import daemon
 from . import db
 import re
 import time
-import urlparse
+import urllib.parse
 
 from trace_event import *
 from .query import Query
@@ -60,7 +64,7 @@ class DBStub(object):
             "status": 'OK'}
 
   def list_dirs(self, m, verb, data):
-    return map(lambda d: d.__getstate__(), self.db.dirs)
+    return [d.__getstate__() for d in self.db.dirs]
 
   def get_dir(self, m, verb, data):
     id = m.group(1)

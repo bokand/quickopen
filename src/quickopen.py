@@ -76,7 +76,7 @@ def CMDrmdir(parser):
   ok = True
   for d in args:
     found = False
-    for k in dmap.keys():
+    for k in list(dmap.keys()):
       try:
         same = os.path.samefile(d, k)
       except:

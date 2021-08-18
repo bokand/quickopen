@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import object
 import os
 import fnmatch
 
@@ -58,7 +59,7 @@ class DirCache(object):
     return False
 
   def iterdirnames(self):
-    return self.dirs.iterkeys()
+    return iter(self.dirs.keys())
 
   def listdir_with_changed_status(self, d):
     """

@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from __future__ import division
 # Copyright 2011 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,17 +13,22 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from past.utils import old_div
+from builtins import object
 from future.utils import raise_
 from . import async_http_connection
-import httplib
+import http.client
 import os
 import socket
 import subprocess
 import sys
 import time
 import json
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 
 from .db_status import DBStatus
 from .event import Event
@@ -47,7 +53,7 @@ class DBProxy(object):
     self._start_if_needed = start_if_needed
     self._port_for_autostart = port_for_autostart
     self.couldnt_start_daemon = Event()
-    self.conn = httplib.HTTPConnection(host, port, True)
+    self.conn = http.client.HTTPConnection(host, port, True)
     self._dir_lut = {}
 
   @property
@@ -72,10 +78,10 @@ class DBProxy(object):
 
     per_iter_delay = 0.1
     timeout = 10
-    num_tries = int(timeout / per_iter_delay)
+    num_tries = int(old_div(timeout, per_iter_delay))
     for i in range(num_tries):
       try:
-        conn = httplib.HTTPConnection('localhost', port_for_autostart, True)
+        conn = http.client.HTTPConnection('localhost', port_for_autostart, True)
         conn.request('GET', '/ping')
       except Exception as ex:
         time.sleep(per_iter_delay)
@@ -102,7 +108,7 @@ class DBProxy(object):
       data = json.dumps(data)
     try:
       self.conn.request(method, path, data)
-    except httplib.CannotSendRequest:
+    except http.client.CannotSendRequest:
       self.conn = None
     except socket.error:
       self.conn = None
@@ -113,7 +119,7 @@ class DBProxy(object):
           self.couldnt_start_daemon.fire()
           raise Exception("Daemon did not come up")
         self._start_if_needed = False # dont try to autostart again
-      self.conn = httplib.HTTPConnection(self.host, self.port, True)
+      self.conn = http.client.HTTPConnection(self.host, self.port, True)
       self.conn.request(method, path, data)
     else:
       self._should_try_autostart = False
@@ -144,7 +150,7 @@ class DBProxy(object):
   @property
   def dirs(self):
     ret = self._req('GET', '/dirs')
-    return map(lambda x: self._get_dir(x["id"], x["path"]), ret)
+    return [self._get_dir(x["id"], x["path"]) for x in ret]
 
   def add_dir(self, d):
     ret = self._req('POST', '/dirs/add', {"path": os.path.abspath(d)})

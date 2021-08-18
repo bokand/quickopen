@@ -12,6 +12,8 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import cmp
+from builtins import object
 import hashlib
 import logging
 import os
@@ -85,7 +87,7 @@ class DB(object):
   ###########################################################################
 
   def _on_settings_dirs_changed(self, old, new):
-    self._dirs = map(lambda d: DBDir(d), new)
+    self._dirs = [DBDir(d) for d in new]
     self._set_dirty()
 
   @property

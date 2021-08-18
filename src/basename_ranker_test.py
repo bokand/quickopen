@@ -12,6 +12,7 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import range
 import unittest
 from .basename_ranker import BasenameRanker
 
@@ -65,7 +66,7 @@ class BasenameRankerTest(unittest.TestCase):
       'AbcDef': [0,3],
       'Abc_Def': [0,4],
       }
-    for word, expected_starts in data.items():
+    for word, expected_starts in list(data.items()):
       starts = self.ranker.get_starts(word)
       self.assertEquals(expected_starts, starts, "for %s, expect %s" % (word, expected_starts))
 

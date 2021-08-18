@@ -11,7 +11,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from cStringIO import StringIO
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from past.builtins import basestring
+from io import StringIO
 
 # Pyton-serial object notation
 class PSONException(Exception):
@@ -34,7 +38,7 @@ def _dumps_flat(obj):
   if isinstance(obj,list):
     return "[%s]" % ", ".join([_dumps_flat(c) for c in obj])
   elif isinstance(obj,dict):
-    rows = ["\"%s\" : %s" % (key,_dumps_flat(obj[key])) for key in obj.keys()]
+    rows = ["\"%s\" : %s" % (key,_dumps_flat(obj[key])) for key in list(obj.keys())]
     return "{%s}" % ", ".join(rows)
   elif isinstance(obj,bool):
     if obj:
@@ -62,7 +66,7 @@ def _issimple(obj):
       if isinstance(obj,list):
         return _issimple(obj[0])
       else:
-        return _issimple(obj.values()[0])
+        return _issimple(list(obj.values())[0])
     else:
       return True
   else:
@@ -94,7 +98,7 @@ def _dumps_pretty(i,obj):
 
     s = StringIO()
     s.write("{\n")
-    keys = obj.keys()
+    keys = list(obj.keys())
     keys.sort()
     for j in range(len(keys)):
       k = keys[j]

@@ -12,6 +12,8 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from builtins import range
+from builtins import object
 import os
 import unittest
 from . import query
@@ -47,7 +49,7 @@ class FakeDBShardManager(object):
   def search_basenames(self, basename_query):
     res = []
     lower_basename_query = basename_query.lower()
-    for bn in self.files_by_lower_basename.keys():
+    for bn in list(self.files_by_lower_basename.keys()):
       if bn.find(lower_basename_query) != -1:
         res.append(bn)
     return res, False

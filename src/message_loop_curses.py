@@ -13,6 +13,11 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from past.builtins import cmp
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import curses
 from . import event
 import select
@@ -20,7 +25,7 @@ import sys
 import time
 import traceback
 import unittest
-import cStringIO
+import io
 
 # Set the following to True in order to redirect stdout to
 #   /tmp/quickopen.stdout
@@ -135,7 +140,7 @@ def run_main_loop():
     sys.stdout = tempStdout
     sys.stderr = sys.stdout
   else:
-    tempStdout = cStringIO.StringIO()
+    tempStdout = io.StringIO()
     sys.stdout = tempStdout
     sys.stderr = sys.stdout
 
