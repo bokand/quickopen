@@ -37,7 +37,7 @@ def _is_port_bindable(host, port):
 class PrelaunchedProcess(object):
   def __init__(self, proc, port):
     if not isinstance(proc, subprocess.Popen):
-      raise "Expected subprocess"
+      raise Exception("Expected subprocess")
     self.proc = proc
     self.port = port
 

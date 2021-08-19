@@ -168,7 +168,7 @@ class DBProxy(object):
     try:
       ret = self._req('POST', '/ignores/remove', i)
     except:
-      raise "Pattern not found"
+      raise Exception("Pattern not found")
 
   def get_oauth(self):
     ret = self._req('GET', '/get_oauth')
