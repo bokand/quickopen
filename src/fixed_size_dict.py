@@ -23,7 +23,7 @@ class _LinkedListNode(object):
       pd = self.prev.data
     else:
       pd = "None"
-    if self.__next__:
+    if self.next:
       nd = self.next.data
     else:
       nd = "None"
@@ -42,7 +42,7 @@ class _LinkedList(object):
     ret = []
     while n:
       ret.append(n.data)
-      n = n.__next__
+      n = n.next
     return ret
 
   def __repr__(self):
@@ -82,8 +82,8 @@ class _LinkedList(object):
     else:
       new_node = _LinkedListNode(d)
     new_node.prev = node
-    new_node.next = node.__next__
-    if node.__next__ == None:
+    new_node.next = node.next
+    if node.next == None:
       self.tail = new_node
     else:
       node.next.prev = new_node
@@ -98,11 +98,11 @@ class _LinkedList(object):
 
   def remove(self, n):
     if n.prev == None:
-      self.head = n.__next__
+      self.head = n.next
     else:
-      n.prev.next = n.__next__
+      n.prev.next = n.next
 
-    if n.__next__ == None:
+    if n.next == None:
        self.tail = n.prev
     else:
        n.next.prev = n.prev
