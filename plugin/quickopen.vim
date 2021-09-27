@@ -34,7 +34,6 @@ function! s:GetDefaultBasePath()
 endfunction
 
 function! s:RunQuickOpen(args)
-  let res = system(s:QuickOpenApp . " " . a:args)
   let source_path = s:GetDefaultBasePath()
   let base_path_arg = ""
   if source_path != ""
