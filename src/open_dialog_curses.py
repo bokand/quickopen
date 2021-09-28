@@ -177,8 +177,6 @@ class OpenDialogCurses(OpenDialogBase):
         self._update_filter_text()
     elif k == '^R':
       self.on_reindex_clicked()
-    elif k == '^T':
-      self.on_badresult_clicked()
     elif k == '?':
       self._toggle_help()
     else:
@@ -294,8 +292,6 @@ class OpenDialogCurses(OpenDialogBase):
                     C-r    Reindex
                     C-g    Quit
                 <enter>    Open selected item
-
-                    C-t    Report bad result
 
             Basic readline-style editing shortcuts should work:
                     C-a, C-e, C-f, C-b, C-k
