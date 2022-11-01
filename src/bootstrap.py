@@ -38,7 +38,6 @@ def run(prelaunch=False):
   mod = __import__(main_name, {}, {}, True)
   import optparse
   parser = optparse.OptionParser(usage=mod.main_usage())
-  parser.add_option('--chrome', action="store_true", dest="chrome", help="Use chrome app UI")
   parser.add_option('--curses', action="store_true", dest="curses", help="Use curses UI")
   parser.add_option(
       '-v', '--verbose', action='count', default=0,
@@ -76,19 +75,7 @@ def main(main_name):
     prelaunch_client.remove_prelaunch_from_sys_argv()
 
   if sys.platform == 'darwin':
-    if ('--chrome' in sys.argv):
-      sys.argv.insert(1, '--main-name')
-      sys.argv.insert(2, main_name)
-      sys.exit(run())
-
     if ('--curses' in sys.argv):
-      sys.argv.insert(1, '--main-name')
-      sys.argv.insert(2, main_name)
-      sys.exit(run())
-
-    # Try using chrome.
-    from . import message_loop_chrome
-    if message_loop_chrome.supported():
       sys.argv.insert(1, '--main-name')
       sys.argv.insert(2, main_name)
       sys.exit(run())

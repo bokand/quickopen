@@ -23,7 +23,6 @@ _platform_message_loop = None
 TOOLKIT_GTK = 'gtk'
 TOOLKIT_WX = 'wx'
 TOOLKIT_CURSES = 'curses'
-TOOLKIT_CHROME = 'chrome'
 
 def _initialize_if_needed():
   global _initialized
@@ -42,11 +41,6 @@ def _detect_toolkit():
   # use curses if its specified
   if '--curses' in sys.argv:
     _toolkit = TOOLKIT_CURSES
-    return
-
-  # use chrome if specified
-  if '--chrome' in sys.argv:
-    _toolkit = TOOLKIT_CHROME
     return
 
   # check whether we even have X
@@ -97,21 +91,12 @@ def supports_prelaunch():
   if '--curses' in sys.argv:
     return False
 
-  # use chrome if specified
-  if '--chrome' in sys.argv:
-    return False
-
   # check whether we even have X
   if os.getenv('DISPLAY'):
     pass
   elif sys.platform == 'darwin':
     pass
   else:
-    return False
-
-  # Try using chrome.
-  from . import message_loop_chrome
-  if message_loop_chrome.supported():
     return False
 
   return True
