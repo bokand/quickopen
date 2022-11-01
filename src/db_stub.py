@@ -22,7 +22,6 @@ import re
 import time
 import urllib.parse
 
-from trace_event import *
 from .query import Query
 
 
@@ -95,17 +94,14 @@ class DBStub(object):
       raise daemon.SilentException()
     return {"status": "OK"}
 
-  @traced
   def search(self, m, verb, data):
     query = Query.from_dict(data)
     return self.db.search(query).as_dict()
 
-  @traced
   def sync(self, m, verb, data):
     self.db.sync()
     return {"status": "OK"}
 
-  @traced
   def status(self, m, verb, data):
     return self.db.status().as_dict()
 

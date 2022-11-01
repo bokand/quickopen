@@ -24,7 +24,6 @@ import time
 
 from .basename_ranker import BasenameRanker
 from .query_result import QueryResult
-from trace_event import *
 
 def _is_in_base_path(filename, base_path):
   expanded_base_path = os.path.expandvars(os.path.expanduser(base_path))
@@ -225,7 +224,6 @@ class Query(object):
       "debug": self.debug}
 
 
-  @traced
   def execute(self, shard_manager, query_cache):
     """
     Searches the index given the provided query.
@@ -298,13 +296,11 @@ class Query(object):
             break
 
     # Rank the results
-    trace_begin("rank_results")
     hits = []
     basename_ranker = BasenameRanker()
     for f in files:
       basename = os.path.basename(f)
       rank = basename_ranker.rank_query(basename_query, basename)
       hits.append((f,rank))
-    trace_end("rank_results")
 
     return QueryResult(hits=hits, truncated=truncated)

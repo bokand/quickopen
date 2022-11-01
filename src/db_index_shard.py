@@ -19,7 +19,6 @@ import fnmatch
 import re
 
 from .basename_ranker import BasenameRanker
-from trace_event import *
 
 class DBIndexShard(object):
   def __init__(self, basenames):
@@ -61,7 +60,6 @@ class DBIndexShard(object):
       items.sort(key=lambda x:x[1])
       self.basenames_by_wordstarts[ws] = [i[0] for i in items]
 
-  @traced
   def search_basenames(self, query):
     """
     Searches index for basenames matching the query.
@@ -77,19 +75,13 @@ class DBIndexShard(object):
     max_hits_hint = 25
 
     # add exact matches first
-    trace_begin("exact")
     self.add_all_matching( lower_hits, query, self.get_exact_match_filter(lower_query), max_hits_hint )
-    trace_end("exact")
 
     # add in word starts
-    trace_begin("wordstarts")
     self.add_all_wordstarts_matching( lower_hits, query, max_hits_hint )
-    trace_end("wordstarts")
 
     # add in substring matches
-    trace_begin("substrings")
     self.add_all_matching( lower_hits, query, self.get_substring_filter(lower_query), max_hits_hint )
-    trace_end("substrings")
 
     # add in superfuzzy matches ONLY if we have no high-quality hit
     has_hq = False
@@ -99,9 +91,7 @@ class DBIndexShard(object):
         has_hq = True
         break
     if not has_hq:
-      trace_begin("superfuzzy")
       self.add_all_matching( lower_hits, query, self.get_superfuzzy_filter(lower_query), max_hits_hint )
-      trace_end("superfuzzy")
 
     return lower_hits, len(lower_hits) == max_hits_hint
 

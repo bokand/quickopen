@@ -24,7 +24,6 @@ from .db_shard_manager import DBShardManager
 from .db_status import DBStatus
 from .dir_cache import DirCache
 from .event import Event
-from trace_event import *
 from .query import Query
 from .query_cache import QueryCache
 from .query_result import QueryResult
@@ -180,7 +179,6 @@ class DB(object):
     if not was_indexing:
       self.needs_indexing.fire()
 
-  @traced
   def status(self):
     if self._pending_indexer:
       # Is an integer briefly between _set_dirty and first step_indexer
@@ -203,7 +201,6 @@ class DB(object):
     res.status = status
     return res
 
-  @traced
   def step_indexer(self):
     if not self._pending_indexer:
       return
@@ -234,7 +231,6 @@ class DB(object):
       self.step_indexer()
 
   ###########################################################################
-  @traced
   def search(self, *args, **kwargs):
     """
     Searches the database.

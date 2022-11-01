@@ -79,7 +79,6 @@ def run_command_in_existing(daemon_host, daemon_port, args, auto_start=True):
       sys.stdout = io.StringIO()
       sys.stderr = sys.stdout
 
-      sys.path.append(os.path.join(os.path.dirname(__file__), "../third_party/py_trace_event/"))
       from . import db_proxy
       db_proxy.DBProxy.try_to_start_quickopend(daemon_port)
       try:

@@ -25,8 +25,6 @@ import sys
 import time
 import logging
 
-from trace_event import *
-
 def _is_port_bindable(host, port):
   import socket
   s = socket.socket()
@@ -72,7 +70,6 @@ class PrelaunchDaemon(object):
       return self._next_control_port
     raise Exception("Could not find open control port")
 
-  @traced
   def _launch_new_quickopen(self, display):
     if display in self._quickopen:
       return
@@ -89,19 +86,14 @@ class PrelaunchDaemon(object):
                    "--wait",
                    "--control-port",
                    str(control_port)]
-    if "--trace" in sys.argv:
-      launch_args.append("--trace")
     proc = subprocess.Popen(launch_args,
                              env=env)
     self._quickopen[display] = PrelaunchedProcess(proc, control_port)
 
-  @traced
   def get_existing_quickopen(self, m, verb, data):
     display = m.group(1)
     if display not in self._quickopen:
-      trace_begin("prelaunch_wasnt_available")
       self._launch_new_quickopen(display)
-      trace_end("prelaunch_wasnt_available")
     try:
       proc = self._quickopen[display]
       del self._quickopen[display]
@@ -118,7 +110,6 @@ class PrelaunchDaemon(object):
   def _on_exit(self):
     self.stop()
 
-  @traced
   def _join_in_use_processes(self):
     procs = list(self._in_use_processes)
     del self._in_use_processes[:]

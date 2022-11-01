@@ -25,14 +25,12 @@ import sys
 import time
 
 from .db_status import DBStatus
-from trace_event import *
 
 TICK_RATE_WHEN_SEARCHING = 0.005
 TICK_RATE_WHEN_UP_TO_DATE = 0.025
 TICK_RATE_WHEN_NOT_UP_TO_DATE = 0.2
 
 class OpenDialogBase(object):
-  @traced
   def __init__(self, options, db, initial_filter = None):
     self._filter_text = ""
     if initial_filter:
@@ -71,7 +69,6 @@ class OpenDialogBase(object):
 
     self.set_results_enabled(can_process)
 
-  @traced
   def set_filter_text(self, text):
     self._filter_text = text
 
@@ -115,9 +112,7 @@ class OpenDialogBase(object):
       q.base_path = self._options.base_path
     return q
 
-  @traced
   def on_tick(self,*args):
-    @traced
     def begin_search():
       self.frontend_status = "searching"
 
@@ -125,7 +120,6 @@ class OpenDialogBase(object):
       self._pending_search = self._db.search_async(q)
       self._last_search_query = q
 
-    @traced
     def on_ready():
       try:
         res = self._pending_search.result
@@ -133,15 +127,12 @@ class OpenDialogBase(object):
         res = None
       self.frontend_status = None
       self._pending_search = None
-      trace_begin("update_results_list")
       if res:
         self.update_results_list(res.filenames,res.ranks)
       else:
         self.update_results_list([],[])
-      trace_end("update_results_list")
       self._pending_search = None
 
-    @traced
     def update_backend_status():
       self.backend_status = self._db.status()
 
@@ -183,7 +174,6 @@ class OpenDialogBase(object):
   # Their intent is us opening the first hit for abcd. To achieve this,
   # we need to wait until the current query is done. This will begin a new query
   # we for 'cd' which we will then wait for as well.
-  @traced
   def _wait_for_pending_search_complete(self, wait_again=True):
     if not self._pending_search:
       return
@@ -194,7 +184,6 @@ class OpenDialogBase(object):
     if wait_again and self._pending_search:
       return self._wait_for_pending_search_complete(False)
 
-  @traced
   def on_done(self, canceled):
     if canceled:
       res = []

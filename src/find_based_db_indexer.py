@@ -24,7 +24,6 @@ import tempfile
 import time
 
 from src import db_indexer
-from trace_event import *
 
 LINES_TO_READ_PER_SELECT = 1000
 
@@ -183,11 +182,9 @@ class FindBasedDBIndexer(db_indexer.DBIndexer):
         return
 
       logging.debug('Find finished.')
-      trace_begin("read")
       with codecs.open(
               self._find_results_tempfile.name, 'r', encoding='utf8') as f:
         lines = f.readlines()
-      trace_end("read")
       self._did_finish_searching_dir()
       if len(lines) > 0:
         logging.debug('Beginning to process lines.')
@@ -199,7 +196,6 @@ class FindBasedDBIndexer(db_indexer.DBIndexer):
       logging.debug('Done.')
       self.complete = True
 
-  @traced
   def _begin_searching_next_dir(self):
     if len(self._remaining_dirs) == 0:
       return
@@ -244,7 +240,6 @@ class FindBasedDBIndexer(db_indexer.DBIndexer):
       self._current_find_dir = None
       self._lines_needing_processing = None
 
-  @traced
   def _process_lines(self, current_find_dir, lines):
     dlf = _DirectoryLevelFilter(_MakeIgnorePredicate(self._dirname_ignores))
     blf = _BasenameLevelFilter(_MakeIgnorePredicate(self._basename_ignores))

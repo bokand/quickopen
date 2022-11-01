@@ -28,7 +28,6 @@ import http.server
 import time
 
 from .event import Event
-from trace_event import *
 from .silent_exception import *
 from functools import total_ordering
 

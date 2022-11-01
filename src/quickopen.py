@@ -29,13 +29,6 @@ from .db_exception import DBException
 from .db_status import DBStatus
 from .query import Query
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "../third_party/py_trace_event/"))
-try:
-  from trace_event import *
-except:
-  print("Could not find py_trace_event. Did you forget 'git submodule update --init'")
-  sys.exit(255)
-
 import src.db_proxy
 
 ###########################################################################
@@ -133,7 +126,6 @@ def split_open_filenames(open_filenames):
   # TODO(nduca): deal correctly with \: not being a delimiter
   return open_filenames.split(":")
 
-@traced
 def CMDsearch(parser):
   """Search for a file"""
   if prelaunch.is_prelaunched_process() and (
@@ -153,8 +145,6 @@ def CMDsearch(parser):
 
   message_loop.ensure_has_message_loop()
 
-  if not trace_is_enabled() and options.trace:
-    trace_enable("%s.trace" % sys.argv[0])
   db = open_db(options)
 
   def print_results(res, canceled):
@@ -319,7 +309,6 @@ def CMDprelaunch(parser):
   options.control_port = int(options.control_port)
   prelaunch.wait_for_command(options.control_port)
 
-@traced
 def open_db(options):
   return src.db_proxy.DBProxy(options.host, options.port, start_if_needed=options.auto_start, port_for_autostart=options.port)
 
@@ -368,13 +357,10 @@ def main(parser):
   # Create the option parse and add --verbose support.
   parser.add_option('--host', dest='host', action='store', help='Hostname of quickopend server. Default is %i' % default_port.get())
   parser.add_option('--port', dest='port', action='store', help='Port for quickopend')
-  parser.add_option('--trace', dest='trace', action='store_true', default=False, help='Records performance tracing information to quickopen.trace')
   parser.add_option('--no_auto_start', dest='auto_start', action='store_false', default=True, help='Prevents quickopend from auto-launching if not started')
   old_parser_args = parser.parse_args
   def parse():
     options, args = old_parser_args()
-    if options.trace:
-      trace_enable("./%s.trace" % "quickopen")
     if not options.host:
       options.host = 'localhost'
     if not options.port:

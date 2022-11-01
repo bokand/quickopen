@@ -32,8 +32,6 @@ import src.db_stub
 import src.settings
 import src.prelaunchd
 
-from trace_event import *
-
 class ForegroundDaemonContext(object):
   def __enter__(self):
     pass
@@ -49,10 +47,6 @@ def is_port_listening(host, port):
     return False
   s.close()
   return True
-
-def flush_trace_event(daemon):
-  trace_flush()
-  daemon.add_delayed_task(flush_trace_event, 5, daemon)
 
 def CMDrun(parser):
   """Runs the quickopen daemon"""
@@ -79,8 +73,6 @@ def CMDrun(parser):
 
     with context:
       service = src.daemon.create(options.host, options.port, options.test)
-      if trace_is_enabled():
-        service.add_delayed_task(flush_trace_event, 5, service)
       db_stub = src.db_stub.DBStub(options.settings, service)
       prelaunchd = src.prelaunchd.PrelaunchDaemon(service)
 
@@ -208,14 +200,11 @@ def main(parser):
   parser.add_option('--port', dest='port', action='store', help='Port to run on')
   parser.add_option('--settings', dest='settings', action='store', default='~/.quickopend', help='Settings file to use')
   parser.add_option('--test', dest='test', action='store_true', default=False, help='Adds test hooks')
-  parser.add_option('--trace', dest='trace', action='store_true', default=False, help='Records performance tracing information to quickopen.trace')
   parser.add_option('--foreground', dest='foreground', action='store_true', default=False, help='Starts quickopend in the foreground instead of forking')
   parser.add_option('--preserve-stdout', dest='preserve_stdout', action='store_true', default=False, help='Keeps the stdout of the daemon')
   old_parser_args = parser.parse_args
   def parse():
     options, args = old_parser_args()
-    if options.trace:
-      trace_enable("./%s.trace" % "quickopen")
     settings_file = os.path.expanduser(options.settings)
     settings = src.settings.Settings(settings_file)
     settings.register('host', str, 'localhost')

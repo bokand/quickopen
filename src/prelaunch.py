@@ -34,7 +34,6 @@ import time
 import io
 
 from .db_status import DBStatus
-from trace_event import *
 
 _is_prelaunched_process = False
 
@@ -47,7 +46,6 @@ def wait_for_command(control_port):
 
   s = socket.socket()
   try:
-    trace_begin("bind_to_control_port")
     bound = False
     for i in range(10):
       try:
@@ -58,19 +56,14 @@ def wait_for_command(control_port):
         time.sleep(0.1)
     if not bound:
       raise Exception("could not bind!")
-    trace_end("bind_to_control_port")
 
     s.listen(1)
-    trace_begin("socket.accept")
     c, a = s.accept()
-    trace_end("socket.accept")
     f = c.makefile(mode="rw")
 
     # The commandline comes in as a repr'd array
     # Yes this is not very secure. Donations welcome.
-    trace_begin("read_command")
     args = eval(f.readline(), {}, {})
-    trace_end("read_command")
 
     # We want to send the commandline args to quickopen's regular
     # main now, and redirect the stdout output over to the prelauncher.
@@ -94,8 +87,6 @@ def wait_for_command(control_port):
     finally:
       sys.argv = old_argv
       sys.stdout = old_stdout
-
-    trace_end("exec_command")
 
     # Finally, give the results back to the prelauncher so that
     # it can do its work. Pass the string via repr so we can use

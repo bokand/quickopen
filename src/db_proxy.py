@@ -32,7 +32,6 @@ import urllib.parse
 
 from .db_status import DBStatus
 from .event import Event
-from trace_event import *
 from .query import Query
 from .query_result import QueryResult
 
@@ -186,7 +185,6 @@ class DBProxy(object):
     ret = self._req('POST', '/set_oauth', {"token": token})
     assert ret["status"] == 'OK'
 
-  @traced
   def search(self, *args, **kwargs):
     """
     Searches the database.
@@ -208,11 +206,9 @@ class DBProxy(object):
   def has_index(self):
     return self.status().has_index
 
-  @traced
   def sync(self):
     ret = self._req('POST', '/sync')
 
-  @traced
   def status(self):
     try:
       d = self._req('GET', '/status')

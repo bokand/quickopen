@@ -20,7 +20,6 @@ from . import db_index_shard
 import multiprocessing
 
 from .local_pool import *
-from trace_event import *
 
 slave = None
 slave_searchcount = 0
@@ -34,8 +33,6 @@ def ShardSearchBasenames(basename_query):
   global slave_searchcount
   ret = slave.search_basenames(basename_query)
   slave_searchcount += 1
-  if trace_is_enabled() and slave_searchcount % 10 == 0:
-    trace_flush()
   return ret
 
 class DBShardManager(object):
@@ -106,14 +103,11 @@ class DBShardManager(object):
     """
     shard_result_handles = []
     # Run the search in parallel across the shards.
-    trace_begin("issue_search")
     for i in range(len(self.shards)):
       shard = self.shards[i]
       shard_result_handles.append(shard.apply_async(ShardSearchBasenames, (basename_query,)))
-    trace_end("issue_search")
 
     # union the results
-    trace_begin("gather_results")
     base_hits = set()
     truncated = False
     for shard_result_handle in shard_result_handles:
@@ -121,5 +115,4 @@ class DBShardManager(object):
       truncated |= shard_hits_truncated
       for hit in shard_hits:
         base_hits.add(hit)
-    trace_end("gather_results")
     return list(base_hits), truncated
