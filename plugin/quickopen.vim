@@ -30,7 +30,7 @@ function! s:GetDefaultBasePath()
       return ""
     endif
 
-    return join(dirs[0:ix-1], "/")
+    return "/" . join(dirs[0:ix-1], "/")
 endfunction
 
 function! s:RunQuickOpen(args)
