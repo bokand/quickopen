@@ -89,7 +89,7 @@ class OpenDialogCurses(OpenDialogBase):
 
   def _on_readable(self):
     kcode = self._stdscr.getch()
-    k = curses.keyname(kcode)
+    k = curses.keyname(kcode).decode("utf-8")
     if k == '^[':
       n = self._stdscr.getch()
       nk = curses.keyname(n)

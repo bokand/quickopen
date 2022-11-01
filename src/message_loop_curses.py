@@ -18,6 +18,8 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import str
 from builtins import object
+from functools import cmp_to_key
+from functools import total_ordering
 import curses
 from . import event
 import select
@@ -34,6 +36,8 @@ DEBUG = False
 _main_loop_running = False
 
 _delayed_task_next_seq = 0
+
+@total_ordering
 class DelayedTask(object):
 
   def __init__(self, cb, delay):
@@ -45,12 +49,21 @@ class DelayedTask(object):
     self.run_at_or_after = time.time() + delay
     _delayed_task_next_seq += 1
 
-  def __cmp__(self, that):
-    x = cmp(self.run_at_or_after, that.run_at_or_after)
+
+  def __eq__(self, other):
+    if type(self) != type(other):
+      return False;
+    return self.seq == other.seq and self.run_at_or_after == other.run_at_or_after
+
+  def __ne__(self, other):
+    return not (self == other)
+
+  def __lt__(self, other):
+    x = cmp(self.run_at_or_after, other.run_at_or_after)
     if x == 0:
-      return cmp(self.seq, that.seq)
+      return cmp(self.seq, other.seq) == -1
     else:
-      return x
+      return x == -1
 
 _pending_delayed_tasks = []
 _unittests_running = False
@@ -104,7 +117,7 @@ def _run_pending_tasks():
         _on_exception()
     else:
       _pending_delayed_tasks.append(t)
-  _pending_delayed_tasks.sort(lambda x, y: cmp(x, y))
+  _pending_delayed_tasks.sort(key=cmp_to_key(lambda x, y: cmp(x, y)))
 
 def post_task(cb, *args):
   post_delayed_task(cb, 0, *args)
@@ -113,7 +126,7 @@ def post_delayed_task(cb, delay, *args):
   def on_run():
     cb(*args)
   _pending_delayed_tasks.append(DelayedTask(on_run, delay))
-  _pending_delayed_tasks.sort(lambda x, y: cmp(x, y))
+  _pending_delayed_tasks.sort(key=cmp_to_key(lambda x, y: cmp(x, y)))
 
 def add_quit_handler(cb):
   _quit_handlers.insert(0, cb)
