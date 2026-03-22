@@ -13,9 +13,6 @@ from __future__ import division
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from builtins import range
-from builtins import object
-from past.utils import old_div
 from . import db_index_shard
 import multiprocessing
 
@@ -66,7 +63,7 @@ class DBShardManager(object):
 
   def _make_chunks(self, items, N):
     base = 0
-    chunksize = old_div(len(items), N)
+    chunksize = len(items) // N
     if chunksize == 0:
       chunksize = 1
     chunks = []

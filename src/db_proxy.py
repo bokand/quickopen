@@ -13,12 +13,6 @@ from __future__ import division
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range
-from past.utils import old_div
-from builtins import object
-from future.utils import raise_
 from . import async_http_connection
 import http.client
 import os
@@ -77,7 +71,7 @@ class DBProxy(object):
 
     per_iter_delay = 0.1
     timeout = 10
-    num_tries = int(old_div(timeout, per_iter_delay))
+    num_tries = int(timeout // per_iter_delay)
     for i in range(num_tries):
       try:
         conn = http.client.HTTPConnection('localhost', port_for_autostart, True)
@@ -251,7 +245,7 @@ class AsyncSearch(object):
        if res.status != 200:
          #self.async_conn.close()
          self.async_conn = None
-         raise_(AsyncSearchError, 'got status %i' % res.status)
+         raise AsyncSearchError('got status %i' % res.status)
        else:
          data = res.read()
          res = json.loads(data)

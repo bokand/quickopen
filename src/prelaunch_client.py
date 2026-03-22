@@ -13,10 +13,6 @@ from __future__ import absolute_import
 
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import range
 from . import default_port
 import os
 import sys

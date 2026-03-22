@@ -16,9 +16,6 @@
 # The prelaunchd's job is to keep a quickopen instance warmed up in the
 # background, and service "give me a prelauncher" requests from quickopend
 # clients.
-from builtins import str
-from builtins import range
-from builtins import object
 import os
 import subprocess
 import sys

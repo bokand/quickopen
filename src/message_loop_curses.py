@@ -13,12 +13,10 @@ from __future__ import absolute_import
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from past.builtins import cmp
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
 from functools import cmp_to_key
+
+def cmp(a, b):
+  return (a > b) - (a < b)
 from functools import total_ordering
 import curses
 from . import event
@@ -82,24 +80,17 @@ def get_stdscr():
   return _stdscr
 
 def _on_exception():
-  import traceback
-  traceback.print_exc()
-  print("exception")
-  return
-  #exc, value, tb = sys.exc_info()
+  exc, value, tb = sys.exc_info()
   if is_main_loop_running() and _active_test:
-    if isinstance(value,unittest.TestCase.failureException):
-      print("hook")
+    if isinstance(value, _active_test.failureException):
       _active_test_result.addFailure(_active_test, (exc, value, tb))
     else:
       if not str(value).startswith("_noprint"):
-        print("Untrapped exception! Exiting message loop with exception.")
+        traceback.print_exc()
       _active_test_result.addError(_active_test, (exc, value, tb))
     quit_main_loop()
-    return
   else:
-    old_hook(exc, value, tb)
-    return
+    traceback.print_exc()
 
 def _run_pending_tasks():
   now = time.time()

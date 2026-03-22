@@ -23,9 +23,6 @@ from __future__ import absolute_import
 # When a new quickopen comes around with a --use-prelaunch, it consults
 # the daemon for prelaunched instance handle and then delegates its actual
 # commandline to that instance (via magic).
-from future import standard_library
-standard_library.install_aliases()
-from builtins import range
 import os
 import socket
 import sys
