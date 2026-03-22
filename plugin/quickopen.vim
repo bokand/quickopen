@@ -118,7 +118,9 @@ endfunction
 
 function! s:OpenFiles(cmd, files_to_open)
   for f in a:files_to_open
-    exec(a:cmd . " " . fnameescape(f))
+    if f != ""
+      exec(a:cmd . " " . fnameescape(f))
+    endif
   endfor
 endfunction
 

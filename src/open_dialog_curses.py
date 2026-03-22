@@ -19,7 +19,6 @@ from . import message_loop
 from . import message_loop_curses
 import time
 import os
-from . import basename_ranker
 
 from .open_dialog_base import OpenDialogBase
 
@@ -89,23 +88,18 @@ class OpenDialogCurses(OpenDialogBase):
   def _on_readable(self):
     kcode = self._stdscr.getch()
     k = curses.keyname(kcode).decode("utf-8")
-    if k == '^[':
-      n = self._stdscr.getch()
-      nk = curses.keyname(n)
-      kcode = kcode << 8 | n
-      k = "M-%s" % curses.keyname(n)
+    if k == '^[' or k == '^C':
+      self.on_done(True)
+      return
 
     if hasattr(self, '_keylog'):
       self._keylog.write('k=[%10s] kcode=[%s]\n' % (k, kcode))
 
     if self._help_visible:
-      if k == '^G':
-        self._toggle_help()
-      elif kcode == ascii.NL:
+      if kcode == ascii.NL:
         self.on_done(False)
       elif k == '?':
         self._toggle_help()
-
       return
 
     if k == 'KEY_UP' or k == '^P':
@@ -116,9 +110,6 @@ class OpenDialogCurses(OpenDialogBase):
       self._selected_index += 1
       self._clamp_selected_index()
       self._update_results()
-    elif k == '^G':
-      self.on_done(True)
-      return
     elif kcode == ascii.NL:
       self.on_done(False)
       return
@@ -128,51 +119,6 @@ class OpenDialogCurses(OpenDialogBase):
         after = self._filter_text[self._filter_text_point:]
         self._filter_text = "%s%s" % (before[:-1], after)
         self._filter_text_point -= 1
-        self._update_filter_text()
-    elif k == '^D':
-      before = self._filter_text[0:self._filter_text_point]
-      after = self._filter_text[self._filter_text_point:]
-      self._filter_text = "%s%s" % (before, after[1:])
-      self._update_filter_text()
-    elif k == '^A':
-      self._filter_text_point = 0
-      self._update_filter_text()
-    elif k == '^E':
-      self._filter_text_point = len(self._filter_text)
-      self._update_filter_text()
-    elif k == '^B' or k == 'KEY_LEFT':
-      self._filter_text_point -= 1
-      self._filter_text_point = max(0, min(self._filter_text_point, len(self._filter_text)))
-      self._update_filter_text()
-    elif k == '^F' or k == 'KEY_RIGHT':
-      self._filter_text_point += 1
-      self._filter_text_point = max(0, min(self._filter_text_point, len(self._filter_text)))
-      self._update_filter_text()
-    elif k == 'M-b':
-      wordstarts = basename_ranker.BasenameRanker().get_starts(self._filter_text)
-      wordstarts.append(len(self._filter_text))
-      candidates = []
-      for start in wordstarts:
-        if start < self._filter_text_point:
-          candidates.append(start)
-      if len(candidates):
-        self._filter_text_point = candidates[-1]
-        self._filter_text_point = max(0, min(self._filter_text_point, len(self._filter_text)))
-        self._update_filter_text()
-    elif k == 'M-f':
-      wordstarts = ranker.Ranker().get_starts(self._filter_text)
-      wordstarts.append(len(self._filter_text))
-      candidates = []
-      for start in wordstarts:
-        if start > self._filter_text_point:
-          candidates.append(start)
-      if len(candidates):
-        self._filter_text_point = candidates[0]
-        self._filter_text_point = max(0, min(self._filter_text_point, len(self._filter_text)))
-        self._update_filter_text()
-    elif k == '^K':
-        before = self._filter_text[0:self._filter_text_point]
-        self._filter_text = before
         self._update_filter_text()
     elif k == '^R':
       self.on_reindex_clicked()
@@ -289,11 +235,8 @@ class OpenDialogCurses(OpenDialogBase):
             Keyboard Reference
             ---------------------------------------------------
                     C-r    Reindex
-                    C-g    Quit
+                C-c/Esc    Quit
                 <enter>    Open selected item
-
-            Basic readline-style editing shortcuts should work:
-                    C-a, C-e, C-f, C-b, C-k
 """
     help_lines = help_text.split("\n")
     for i in range(len(help_lines)):
