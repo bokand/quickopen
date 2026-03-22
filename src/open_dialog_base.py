@@ -111,6 +111,9 @@ class OpenDialogBase(object):
     return q
 
   def on_tick(self,*args):
+    if not message_loop.is_main_loop_running():
+      return
+
     def begin_search():
       self.frontend_status = "searching"
 

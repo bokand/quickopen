@@ -46,7 +46,7 @@ class DBProxy(object):
     self._start_if_needed = start_if_needed
     self._port_for_autostart = port_for_autostart
     self.couldnt_start_daemon = Event()
-    self.conn = http.client.HTTPConnection(host, port, True)
+    self.conn = http.client.HTTPConnection(host, port, timeout=1.0)
     self._dir_lut = {}
 
   @property

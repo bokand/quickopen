@@ -20,6 +20,7 @@ def cmp(a, b):
 from functools import total_ordering
 import curses
 from . import event
+import os
 import select
 import sys
 import time
@@ -205,6 +206,7 @@ def run_main_loop():
       _run_pending_tasks()
   try:
     _main_loop_running = True
+    os.environ['ESCDELAY'] = '0'
     curses.wrapper(main)
   except KeyboardInterrupt:
     raise
