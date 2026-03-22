@@ -214,6 +214,8 @@ class DB(object):
       logging.debug("Indexing with %s took %s seconds",
                     type(self._pending_indexer),
                     elapsed)
+      if self._cur_shard_manager:
+        self._cur_shard_manager.close()
       self._cur_shard_manager = DBShardManager(self._pending_indexer)
       self._cur_query_cache = QueryCache()
       self._pending_indexer = None
