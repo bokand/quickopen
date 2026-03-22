@@ -139,15 +139,6 @@ def run_main_loop():
   global _old_std
   _old_std = [ sys.stdout, sys.stderr ]
 
-  if DEBUG:
-    tempStdout = open('/tmp/quickopen.stdout', 'w', 0)
-    sys.stdout = tempStdout
-    sys.stderr = sys.stdout
-  else:
-    tempStdout = io.StringIO()
-    sys.stdout = tempStdout
-    sys.stderr = sys.stdout
-
   assert not is_main_loop_running()
   if _unittests_running and not _active_test:
     del _pending_delayed_tasks[:]
@@ -157,6 +148,36 @@ def run_main_loop():
   global _main_loop_running
   global _stdscr
   global _quitting
+
+  # When running inside a UITestCase, skip curses (which requires a real
+  # terminal) and run a simple headless task loop instead.
+  if _active_test:
+    try:
+      _main_loop_running = True
+      while _main_loop_running:
+        _run_pending_tasks()
+        if _pending_delayed_tasks:
+          now = time.time()
+          sleep_time = _pending_delayed_tasks[0].run_at_or_after - now
+          if sleep_time > 0:
+            time.sleep(sleep_time)
+        else:
+          time.sleep(0.001)  # yield briefly while waiting for quit
+    finally:
+      _stdscr = None
+      _quitting = False
+      _main_loop_running = False
+      del _pending_delayed_tasks[:]
+    return
+
+  if DEBUG:
+    tempStdout = open('/tmp/quickopen.stdout', 'w', 0)
+    sys.stdout = tempStdout
+    sys.stderr = sys.stdout
+  else:
+    tempStdout = io.StringIO()
+    sys.stdout = tempStdout
+    sys.stderr = sys.stdout
 
   def main(stdscr):
     global _stdscr
