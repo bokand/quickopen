@@ -17,7 +17,6 @@ import logging
 import os
 import wx
 import wx.lib.mixins.listctrl  as  listmix
-from wx.lib import evtmgr
 import sys
 
 from .open_dialog_base import OpenDialogBase
@@ -34,7 +33,7 @@ class OpenDialogWx(wx.Dialog, OpenDialogBase):
     OpenDialogBase.__init__(self, options, db, initial_filter)
 
     if wx.Platform == "__WXMAC__":
-      wx.SystemOptions.SetOptionInt("mac.listctrl.always_use_generic", False)
+      wx.SystemOptions.SetOption("mac.listctrl.always_use_generic", 0)
 
     sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -43,7 +42,7 @@ class OpenDialogWx(wx.Dialog, OpenDialogBase):
     self.status_text_widget = wx.StaticText(self, -1, '')
 
     top_box.Add((10,0))
-    top_box.Add(self.status_text_widget,1, wx.EXPAND | wx.ALL | wx.ALIGN_CENTER_VERTICAL)
+    top_box.Add(self.status_text_widget,1, wx.EXPAND | wx.ALL)
 
     reindex_bn = wx.Button(self, -1, "Reindex")
     reindex_bn.Bind(wx.EVT_BUTTON, lambda *args: self.on_reindex_clicked())
@@ -53,7 +52,7 @@ class OpenDialogWx(wx.Dialog, OpenDialogBase):
     self._results_list = TestListCtrl(self, -1,
                                       style=wx.LC_REPORT | wx.BORDER_NONE)
 
-    middle_box.Add(self._results_list, 1, wx.ALIGN_CENTRE|wx.ALL|wx.EXPAND)
+    middle_box.Add(self._results_list, 1, wx.ALL|wx.EXPAND)
 
     filter_box = wx.BoxSizer(wx.HORIZONTAL)
     self._filter_ctrl = wx.TextCtrl(self, -1, self._filter_text)
@@ -73,7 +72,7 @@ class OpenDialogWx(wx.Dialog, OpenDialogBase):
     sizer.Add(top_box, 0, wx.EXPAND|wx.BOTTOM, 8)
     sizer.Add(middle_box, 1, wx.GROW|wx.BOTTOM,8)
     sizer.Add(filter_box, 0, wx.GROW|wx.BOTTOM,7)
-    sizer.Add(lower_sizer, 0, wx.ALIGN_RIGHT|wx.BOTTOM)
+    sizer.Add(lower_sizer, 0, wx.EXPAND|wx.BOTTOM)
 
     outer_sizer = wx.BoxSizer(wx.VERTICAL)
     outer_sizer.Add(sizer, 1, wx.ALL | wx.EXPAND, 8)
@@ -82,7 +81,20 @@ class OpenDialogWx(wx.Dialog, OpenDialogBase):
     self.CenterOnScreen()
     self.Show()
 
+    self.Raise()
     self._filter_ctrl.SetFocus()
+
+    if wx.Platform == '__WXMAC__':
+      def activate():
+        try:
+          from AppKit import NSApp
+          NSApp.activate()  # macOS 14+ API
+        except Exception:
+          import subprocess, os
+          subprocess.Popen(['osascript', '-e',
+              'tell application "System Events" to set frontmost of every process'
+              ' whose unix id is %d to true' % os.getpid()])
+      wx.CallLater(50, activate)
 
     ok = self.FindWindowById(wx.ID_OK)
     cancel = self.FindWindowById(wx.ID_CANCEL)
@@ -149,9 +161,9 @@ class OpenDialogWx(wx.Dialog, OpenDialogBase):
       r = ranks[i]
       base = os.path.basename(f)
       path = os.path.dirname(f)
-      i = self._results_list.InsertStringItem(sys.maxsize, str(r))
-      self._results_list.SetStringItem(i, 1, base)
-      self._results_list.SetStringItem(i, 2, path)
+      idx = self._results_list.InsertItem(sys.maxsize, str(r))
+      self._results_list.SetItem(idx, 1, base)
+      self._results_list.SetItem(idx, 2, path)
 
     if len(files):
       self._results_list.SetItemState(0, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)

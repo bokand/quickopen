@@ -23,9 +23,7 @@ Key features:
 Dependencies
 ================================================================================
 - Linux: python-gtk2
-- OSX or Windows: chrome.
-
-  Yes, chrome. quickopen uses [Chrome Apps v2](http://developer.chrome.com/trunk/apps/about_apps.html) for its UI.
+- OSX or Windows: wxWidgets
 
 Getting started
 ================================================================================
