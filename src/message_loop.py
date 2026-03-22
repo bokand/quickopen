@@ -79,11 +79,7 @@ def _detect_toolkit():
 """)
 
   # use curses as a last resort
-  if '--curses' in sys.argv or not can_have_gui:
-    _toolkit = TOOLKIT_CURSES
-    return
-
-  _toolkit = None
+  _toolkit = TOOLKIT_CURSES
 
 def supports_prelaunch():
   # This function is called on the prelaunch hotpath. Thus, it needs to avoid importing things like gtk or wx,
