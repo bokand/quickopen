@@ -207,7 +207,6 @@ def run_main_loop():
     _main_loop_running = True
     curses.wrapper(main)
   except KeyboardInterrupt:
-    traceback.print_exc()
     raise
   except:
     traceback.print_exc()
