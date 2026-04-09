@@ -74,11 +74,7 @@ function! s:QuickOpenPrompt(cmd, query)
 
   let resultsfile = tempname()
 
-  if !has("nvim")
-    exe "new __quickopen__"
-  else
-    exe "e __quickopen__"
-  endif
+  exe "new __quickopen__"
 
   setlocal buftype=nofile
   setlocal bufhidden=hide
