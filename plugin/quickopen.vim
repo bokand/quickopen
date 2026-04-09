@@ -50,10 +50,29 @@ function! s:RunQuickOpen(args)
   return split(res, "\n", 0)
 endfunction
 
+function! s:OpenFileInTab(file)
+  let fullpath = fnamemodify(a:file, ':p')
+  for i in range(1, tabpagenr('$'))
+    for buf in tabpagebuflist(i)
+      if expand('#' . buf . ':p') == fullpath
+        exe 'tabnext ' . i
+        return
+      endif
+    endfor
+  endfor
+  " If the current tab has an empty unnamed buffer (e.g. on first run), reuse
+  " it instead of opening a new tab.
+  if bufname('%') == '' && line('$') == 1 && getline(1) == '' && !&modified
+    exe 'edit ' . fnameescape(a:file)
+  else
+    exe 'tabedit ' . fnameescape(a:file)
+  endif
+endfunction
+
 let s:TermCallback = {}
 function! s:TermCallback.on_exit(id, code, event)
   exe "bdel!"
-  call s:OpenFiles(self.cmd, s:ReadResults(self.resultsfile))
+  call s:OpenFiles(s:ReadResults(self.resultsfile))
 endfunction
 
 function! s:ReadResults(resultsfile)
@@ -67,7 +86,7 @@ function! s:ReadResults(resultsfile)
   return files
 endfunction
 
-function! s:QuickOpenPrompt(cmd, query)
+function! s:QuickOpenPrompt(query)
   if has("gui_running")
     return s:RunQuickOpen("prelaunch search " . a:query)
   endif
@@ -97,35 +116,34 @@ function! s:QuickOpenPrompt(cmd, query)
   setlocal statusline=quickopen
   setlocal nonumber
   let s:TermCallback.resultsfile = l:resultsfile
-  let s:TermCallback.cmd = a:cmd
   call termopen(l:quickOpenCmd, copy(s:TermCallback))
   startinsert
   return []
 endfunction
 
-function! s:QuickOpenSingle(cmd, query)
+function! s:QuickOpenSingle(query)
   let res = s:RunQuickOpen("search --only-if-exact-match " . a:query)
   if empty(res) || res[0] == ""
-    call QuickFind(a:cmd, a:query)
+    call QuickFind(a:query)
     return
   endif
-  exec(a:cmd . " " . fnameescape(res[0]))
+  call s:OpenFileInTab(res[0])
 endfunction
 
-function! s:OpenFiles(cmd, files_to_open)
+function! s:OpenFiles(files_to_open)
   for f in a:files_to_open
     if f != ""
-      exec(a:cmd . " " . fnameescape(f))
+      call s:OpenFileInTab(f)
     endif
   endfor
 endfunction
 
-function! QuickFind(cmd, query)
-  let files_to_open = s:QuickOpenPrompt(a:cmd, a:query)
-  call s:OpenFiles(a:cmd, l:files_to_open)
+function! QuickFind(query)
+  let files_to_open = s:QuickOpenPrompt(a:query)
+  call s:OpenFiles(l:files_to_open)
 endfunction
 
-com! -nargs=* O call QuickFind(":find", <q-args>)
+com! -nargs=* O call QuickFind(<q-args>)
 
-nnoremap <silent> gf :call <sid>QuickOpenSingle(':find', expand('<cfile>'))<cr>
-nnoremap <silent> <c-w>gf :call <sid>QuickOpenSingle(':sp', expand('<cfile>'))<cr>
+nnoremap <silent> gf :call <sid>QuickOpenSingle(expand('<cfile>'))<cr>
+nnoremap <silent> <c-w>gf :call <sid>QuickOpenSingle(expand('<cfile>'))<cr>
