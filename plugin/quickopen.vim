@@ -102,7 +102,7 @@ function! s:QuickOpenPrompt(cmd, query)
   setlocal nonumber
   let s:TermCallback.resultsfile = l:resultsfile
   let s:TermCallback.cmd = a:cmd
-  call termopen(l:quickOpenCmd, s:TermCallback)
+  call termopen(l:quickOpenCmd, copy(s:TermCallback))
   startinsert
   return []
 endfunction
