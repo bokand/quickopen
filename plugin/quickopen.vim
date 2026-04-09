@@ -65,7 +65,7 @@ function! s:OpenFileInTab(file)
   if bufname('%') == '' && line('$') == 1 && getline(1) == '' && !&modified
     exe 'edit ' . fnameescape(a:file)
   else
-    exe 'tabedit ' . fnameescape(a:file)
+    exe '$tabedit ' . fnameescape(a:file)
   endif
 endfunction
 
