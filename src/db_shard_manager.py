@@ -25,10 +25,10 @@ def ShardInit(basenames):
   global slave
   slave = db_index_shard.DBIndexShard(basenames)
 
-def ShardSearchBasenames(basename_query):
+def ShardSearchBasenames(basename_query, max_hits=None):
   assert slave
   global slave_searchcount
-  ret = slave.search_basenames(basename_query)
+  ret = slave.search_basenames(basename_query, max_hits)
   slave_searchcount += 1
   return ret
 
@@ -90,7 +90,7 @@ class DBShardManager(object):
     # dont clean up their fd resources.
     del self.shards
 
-  def search_basenames(self, basename_query):
+  def search_basenames(self, basename_query, max_hits=None):
     """
     Searches all controlled index shards for basenames matching the query.
 
@@ -102,7 +102,7 @@ class DBShardManager(object):
     # Run the search in parallel across the shards.
     for i in range(len(self.shards)):
       shard = self.shards[i]
-      shard_result_handles.append(shard.apply_async(ShardSearchBasenames, (basename_query,)))
+      shard_result_handles.append(shard.apply_async(ShardSearchBasenames, (basename_query, max_hits)))
 
     # union the results
     base_hits = set()

@@ -57,7 +57,7 @@ class DBIndexShard(object):
       items.sort(key=lambda x:x[1])
       self.basenames_by_wordstarts[ws] = [i[0] for i in items]
 
-  def search_basenames(self, query):
+  def search_basenames(self, query, max_hits=None):
     """
     Searches index for basenames matching the query.
 
@@ -69,7 +69,7 @@ class DBIndexShard(object):
 
     lower_hits = set()
 
-    max_hits_hint = 25
+    max_hits_hint = max_hits if max_hits is not None else 25
 
     # add exact matches first
     self.add_all_matching( lower_hits, query, self.get_exact_match_filter(lower_query), max_hits_hint )

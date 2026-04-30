@@ -44,12 +44,14 @@ class FakeDBShardManager(object):
         self.files_by_lower_basename[bn] = []
       self.files_by_lower_basename[bn].append(f)
 
-  def search_basenames(self, basename_query):
+  def search_basenames(self, basename_query, max_hits=None):
     res = []
     lower_basename_query = basename_query.lower()
     for bn in list(self.files_by_lower_basename.keys()):
       if bn.find(lower_basename_query) != -1:
         res.append(bn)
+        if max_hits and len(res) >= max_hits:
+          return res, True
     return res, False
 
 class MockQuery(Query):
@@ -62,6 +64,9 @@ class MockQuery(Query):
     return Query.execute_nocache(self, shard_manager, query_cache)
 
 class QueryTest(unittest.TestCase):
+  def setUp(self):
+    self.assertEquals = self.assertEqual
+
   def test_cons(self):
     Query("a")
     Query("a", 10)

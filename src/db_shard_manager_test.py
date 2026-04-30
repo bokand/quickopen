@@ -25,6 +25,7 @@ from .query_cache import QueryCache
 
 class DBShardManagerTest(unittest.TestCase):
   def setUp(self,*args,**kwargs):
+    self.assertEquals = self.assertEqual
     self.files = [
         "a/b/csdf.txt",
         "a/b/ghijkl.txt",

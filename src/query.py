@@ -273,7 +273,10 @@ class Query(object):
     # Get the files
     files = []
     if len(basename_query):
-      basename_hits, truncated = shard_manager.search_basenames(basename_query)
+      if dirpart_query != '':
+        basename_hits, truncated = shard_manager.search_basenames(basename_query, max_hits=1000)
+      else:
+        basename_hits, truncated = shard_manager.search_basenames(basename_query)
       for hit in basename_hits:
         hit_files = shard_manager.files_by_lower_basename[hit]
         for f in hit_files:
