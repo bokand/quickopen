@@ -260,10 +260,10 @@ class QueryTest(unittest.TestCase):
   def test_is_dirmatch(self):
     self.assertTrue(query._is_dirmatch("foo", "a/b/foo/"))
     self.assertTrue(query._is_dirmatch("foo", "a/b/foo/c.txt"))
-    self.assertFalse(query._is_dirmatch("foo", "a/b/foo/bar/s.txt"))
+    self.assertTrue(query._is_dirmatch("foo", "a/b/foo/bar/s.txt"))
 
     self.assertTrue(query._is_dirmatch("foo/bar", "/foo/bar/s.txt"))
-    self.assertFalse(query._is_dirmatch("foo/bar", "/foo/bar/a/s.txt"))
+    self.assertTrue(query._is_dirmatch("foo/bar", "/foo/bar/a/s.txt"))
 
   def test_exact_filter_plumbing(self):
     shard_manager = FakeDBShardManager(["foo/bar.txt", "foo/rebar.txt"])

@@ -28,6 +28,7 @@ import sys
 from .db_exception import DBException
 from .db_status import DBStatus
 from .query import Query
+from . import worktree
 
 import src.db_proxy
 
@@ -69,14 +70,20 @@ def CMDrmdir(parser):
   ok = True
   for d in args:
     found = False
+    norm_d = os.path.abspath(os.path.expanduser(d)).rstrip(os.sep)
+    real_d = os.path.realpath(norm_d).rstrip(os.sep)
     for k in list(dmap.keys()):
-      try:
-        same = os.path.samefile(d, k)
-      except:
-        same = False
+      norm_k = k.rstrip(os.sep)
+      same = (norm_d == norm_k or real_d == norm_k)
+      if not same:
+        try:
+          same = os.path.samefile(d, k)
+        except:
+          same = False
       if same:
         db.delete_dir(dmap[k])
-        print("%s removed" % dmap[k].path)
+        del dmap[k]
+        print("%s removed" % k)
         found = True
         break
     if not found:
@@ -215,6 +222,7 @@ def CMDrawsearch(parser):
   parser.add_option('--show-rank', '-r', dest='show_rank', action='store_true', help='Show the ranking of results')
   parser.add_option('--current-filename', dest='current_filename', action='store', default=None, help="Hints quickopen about the current buffer to improve search relevance.")
   parser.add_option('--open-filenames', dest='open_filenames', action='store', default=[], help="Hints quickopen about the filenames currently open to improve search relevance.")
+  parser.add_option('--base-path', dest='base_path', action='store', default=None, help="Show only results under the provided base path.")
   parser.add_option('--debug', dest='debug', action='store_true', default=False, help='Debug the query instead of executing it')
   (options, args) = parser.parse_args()
 
@@ -228,8 +236,11 @@ def CMDrawsearch(parser):
   search_args = {}
   if options.current_filename:
     search_args["current_filename"] = options.current_filename
+  if options.base_path:
+    search_args["base_path"] = options.base_path
   if options.open_filenames:
-    search_args["open_filenames"] = split_open_filenames(options.open_filenames)
+    options.open_filenames = split_open_filenames(options.open_filenames)
+    search_args["open_filenames"] = options.open_filenames
 
   q = Query(args[0],**search_args)
   if options.debug:
@@ -252,6 +263,7 @@ def CMDedit(parser):
   """Searches for <query> then opens it in $EDITOR"""
   parser.add_option('--current-filename', dest='current_filename', action='store', default=None, help="Hints quickopen about the current buffer to improve search relevance.")
   parser.add_option('--open-filenames', dest='open_filenames', action='store', default=[], help="Hints quickopen about the filenames currently open to improve search relevance.")
+  parser.add_option('--base-path', dest='base_path', action='store', default=None, help="Show only results under the provided base path.")
   (options, args) = parser.parse_args()
 
   if len(args) > 1:
@@ -281,7 +293,8 @@ def CMDedit(parser):
   if options.current_filename:
     search_args["current_filename"] = options.current_filename
   if options.open_filenames:
-    search_args["open_filenames"] = split_open_filenames(options.open_filenames)
+    options.open_filenames = split_open_filenames(options.open_filenames)
+    search_args["open_filenames"] = options.open_filenames
 
   if len(args):
     initial_filter = args[0]
@@ -310,7 +323,8 @@ def CMDprelaunch(parser):
   prelaunch.wait_for_command(options.control_port)
 
 def open_db(options):
-  return src.db_proxy.DBProxy(options.host, options.port, start_if_needed=options.auto_start, port_for_autostart=options.port)
+  remapper = worktree.from_cwd(getattr(options, 'cwd', None))
+  return src.db_proxy.DBProxy(options.host, options.port, start_if_needed=options.auto_start, port_for_autostart=options.port, remapper=remapper)
 
 # Subcommand addins to optparse, taken from git-cl.py, 
 # http://src.chromium.org/svn/trunk/tools/depot_tools/git_cl.py
@@ -358,6 +372,7 @@ def main(parser):
   parser.add_option('--host', dest='host', action='store', help='Hostname of quickopend server. Default is %i' % default_port.get())
   parser.add_option('--port', dest='port', action='store', help='Port for quickopend')
   parser.add_option('--no_auto_start', dest='auto_start', action='store_false', default=True, help='Prevents quickopend from auto-launching if not started')
+  parser.add_option('--cwd', dest='cwd', action='store', default=None, help='Client working directory (used for git worktree detection)')
   old_parser_args = parser.parse_args
   def parse():
     options, args = old_parser_args()
@@ -367,6 +382,8 @@ def main(parser):
       options.port = default_port.get()
     else:
       options.port = int(options.port)
+    if not options.cwd:
+      options.cwd = os.getcwd()
     return options, args
   parser.parse_args = parse
 

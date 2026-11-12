@@ -102,11 +102,11 @@ class OpenDialogBase(object):
 
   def _create_query(self):
     q = query.Query(self._filter_text)
-    if self._options.current_filename:
+    if getattr(self._options, 'current_filename', None):
       q.current_filename = self._options.current_filename
-    if self._options.open_filenames:
+    if getattr(self._options, 'open_filenames', None):
       q.open_filenames = self._options.open_filenames
-    if self._options.base_path:
+    if getattr(self._options, 'base_path', None):
       q.base_path = self._options.base_path
     return q
 

@@ -110,6 +110,8 @@ def run_command_in_existing(daemon_host, daemon_port, args, auto_start=True):
     full_args = list(args)
     full_args.extend(["--host=%s" % daemon_host])
     full_args.extend(["--port=%s" % str(daemon_port)])
+    if not any(a == '--cwd' or a.startswith('--cwd=') for a in full_args):
+      full_args.extend(["--cwd=%s" % os.getcwd()])
     f.write(repr(full_args))
     f.write("\n")
     f.flush()

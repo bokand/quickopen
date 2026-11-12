@@ -169,7 +169,7 @@ def _is_dirmatch(lower_dirpart_query, filename):
 
   dirname = os.path.dirname(filename)
   lower_dirname = dirname.lower()
-  if lower_dirname.endswith(lower_dirpart_query):
+  if lower_dirpart_query in lower_dirname:
     return True
   return False
 

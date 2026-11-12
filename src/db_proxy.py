@@ -38,13 +38,14 @@ class DBDirProxy(object):
     return "DBDirProxy(%s, %s)" % (self.id, self.path)
 
 class DBProxy(object):
-  def __init__(self, host, port, start_if_needed = False, port_for_autostart=-1):
+  def __init__(self, host, port, start_if_needed = False, port_for_autostart=-1, remapper=None):
     if start_if_needed and port_for_autostart == -1:
       raise Exception("Cannot start_if_needed without a port_for_autostart")
     self.host = host
     self.port = port
     self._start_if_needed = start_if_needed
     self._port_for_autostart = port_for_autostart
+    self._remapper = remapper
     self.couldnt_start_daemon = Event()
     self.conn = http.client.HTTPConnection(host, port, timeout=1.0)
     self._dir_lut = {}
@@ -186,11 +187,16 @@ class DBProxy(object):
     args should be either a Query object, or arguments to the Query-object constructor.
     """
     query = Query.from_kargs(args, kwargs)
+    if self._remapper:
+      query = self._remapper.remap_query(query)
     d = self._req('POST', '/search', query.as_dict())
-    return QueryResult.from_dict(d)
+    res = QueryResult.from_dict(d)
+    if self._remapper:
+      res = self._remapper.remap_result(res)
+    return res
 
   def search_async(self, *args, **kwargs):
-    return AsyncSearch(self.host, self.port, *args, **kwargs)
+    return AsyncSearch(self.host, self.port, *args, remapper=self._remapper, **kwargs)
 
   @property
   def is_up_to_date(self):
@@ -218,7 +224,7 @@ class AsyncSearchError(BaseException):
   pass
 
 class AsyncSearch(object):
-  def __init__(self, host, port, *args, **kwargs):
+  def __init__(self, host, port, *args, remapper=None, **kwargs):
     """
     Begins an asynchronous search of the database.
 
@@ -226,7 +232,10 @@ class AsyncSearch(object):
 
     args should be either a Query object, or arguments to the Query-object constructor.
     """
+    self._remapper = remapper
     query = Query.from_kargs(args, kwargs)
+    if self._remapper:
+      query = self._remapper.remap_query(query)
     self.async_conn = async_http_connection.AsyncHTTPConnection(host, port)
     self.async_conn.begin_request('POST', '/search', json.dumps(query.as_dict()))
     self._result = None
@@ -250,4 +259,6 @@ class AsyncSearch(object):
          data = res.read()
          res = json.loads(data)
          self._result = QueryResult.from_dict(res)
+         if self._remapper:
+           self._result = self._remapper.remap_result(self._result)
      return self._result
